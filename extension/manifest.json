@@ -1,0 +1,53 @@
+{
+  "manifest_version": 3,
+  "name": "Horizon: Modern New Tab",
+  "version": "1.0.0",
+  "description": "A premium, customizable new tab page for Chrome, Brave, and Chromium browsers.",
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "offline_enabled": true,
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://*.google.com/*",
+    "https://*.googleusercontent.com/*",
+    "https://suggestqueries.google.com/*",
+    "https://search.brave.com/*",
+    "https://api.bing.com/*",
+    "https://duckduckgo.com/*",
+    "https://api.qwant.com/*",
+    "https://ff.search.yahoo.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.google.com/*",
+        "https://myaccount.google.com/*",
+        "https://mail.google.com/*"
+      ],
+      "js": ["content_script.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  },
+  "action": {
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    },
+    "default_title": "Horizon"
+  },
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; img-src 'self' https: data: blob:; style-src 'self' 'unsafe-inline'; connect-src 'self' https:; script-src 'self'"
+  }
+}

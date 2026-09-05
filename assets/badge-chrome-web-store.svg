@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="206" height="58" viewBox="0 0 206 58" fill="none" role="img" aria-label="Available in the Chrome Web Store">
+  <rect x="0.75" y="0.75" width="204.5" height="56.5" rx="8" fill="#131314" stroke="#444746" stroke-width="1.5"/>
+  <g transform="translate(14, 11)">
+    <svg width="36" height="36" viewBox="0 0 190 190" fill="none">
+      <linearGradient id="cws-d" x1="28.3" x2="80.8" y1="75" y2="44.4" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#a52714" stop-opacity=".6"/><stop offset=".7" stop-color="#a52714" stop-opacity="0"/></linearGradient>
+      <linearGradient id="cws-f" x1="109.9" x2="51.5" y1="164.5" y2="130.3" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#055524" stop-opacity=".4"/><stop offset=".3" stop-color="#055524" stop-opacity="0"/></linearGradient>
+      <linearGradient id="cws-h" x1="121.9" x2="136.6" y1="49.8" y2="114.1" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ea6100" stop-opacity=".3"/><stop offset=".7" stop-color="#ea6100" stop-opacity="0"/></linearGradient>
+      <radialGradient id="cws-a" cx="91.2" cy="55" r="84.1" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3e2723" stop-opacity=".2"/><stop offset="1" stop-color="#3e2723" stop-opacity="0"/></radialGradient>
+      <radialGradient id="cws-i" cx="20.9" cy="47.5" r="78" xlink:href="#cws-a"/>
+      <radialGradient id="cws-j" cx="94.8" cy="95.1" r="87.9" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#263238" stop-opacity=".2"/><stop offset="1" stop-color="#263238" stop-opacity="0"/></radialGradient>
+      <radialGradient id="cws-k" cx="33.3" cy="31" r="176.8" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity=".1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+      <clipPath id="cws-b"><circle cx="95" cy="95" r="88"/></clipPath>
+      <g clip-path="url(#cws-b)">
+        <path d="M7 183h83.8l39-39v-29H60.2L7 23.5z" fill="#0f9d58"/>
+        <path d="M7 183h83.8l39-39v-29H60.2L7 23.5z" fill="url(#cws-f)"/>
+        <path d="M95 55l34.6 60L91 183h92V55z" fill="#ffcd40"/>
+        <path d="M95 55l34.6 60L91 183h92V55z" fill="url(#cws-h)"/>
+        <path d="M21 7v108h39.4L95 55h88V7z" fill="#db4437"/>
+        <path d="M21 7v108h39.4L95 55h88V7z" fill="url(#cws-d)"/>
+        <path fill="url(#cws-a)" d="M95 55v21l78.4-21z"/>
+        <path fill="url(#cws-i)" d="M21 47.5l57.2 57.2L60.4 115z"/>
+        <path fill="url(#cws-j)" d="M90.8 183l21-78.3 17.8 10.3z"/>
+        <circle cx="95" cy="95" r="40" fill="#f1f1f1"/>
+        <circle cx="95" cy="95" r="32" fill="#4285f4"/>
+        <circle cx="95" cy="95" r="88" fill="url(#cws-k)"/>
+      </g>
+    </svg>
+  </g>
+  <text x="60" y="24" fill="#C4C7C5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" letter-spacing="0.2">Available in the</text>
+  <text x="60" y="44" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="15" font-weight="600" letter-spacing="0.1">Chrome Web Store</text>
+</svg>

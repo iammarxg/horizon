@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Tab</title>
+  <link rel="icon" type="image/png" href="assets/icons/icon16.png">
+  <link rel="stylesheet" href="newtab.css">
+</head>
+<body>
+
+  <!-- Background crossfade layers -->
+  <div class="bg-layer" id="bg-a"></div>
+  <div class="bg-layer" id="bg-b"></div>
+  <div class="bg-overlay" id="bg-overlay"></div>
+
+  <!-- Top Bar -->
+  <header id="top-bar">
+    <div id="top-left">
+      <div id="clock">00:00</div>
+      <div id="date-display">Sunday, January 1</div>
+    </div>
+    <div id="top-right">
+      <a id="gmail-link" href="https://mail.google.com/mail/u/0/" target="_blank" rel="noopener noreferrer">Gmail</a>
+      <button class="icon-btn" id="apps-btn" title="Google apps" aria-label="Google apps">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
+          <circle cx="3" cy="3" r="1.8"/>
+          <circle cx="9" cy="3" r="1.8"/>
+          <circle cx="15" cy="3" r="1.8"/>
+          <circle cx="3" cy="9" r="1.8"/>
+          <circle cx="9" cy="9" r="1.8"/>
+          <circle cx="15" cy="9" r="1.8"/>
+          <circle cx="3" cy="15" r="1.8"/>
+          <circle cx="9" cy="15" r="1.8"/>
+          <circle cx="15" cy="15" r="1.8"/>
+        </svg>
+      </button>
+      <button class="avatar-btn" id="account-btn" title="Manage accounts" aria-label="Manage accounts">
+        <span id="avatar-inner">G</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main id="main-content">
+
+    <!-- Search Bar -->
+    <div id="search-section">
+      <div id="search-bar-wrapper">
+        <div id="search-bar">
+          <button id="engine-btn" title="Change search engine" aria-label="Change search engine">
+            <img id="engine-icon" src="" alt="Search" width="22" height="22">
+          </button>
+          <input id="search-input" type="text" placeholder="Search the web"
+                 role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="search-suggestions"
+                 autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Search">
+          <button id="search-clear-btn" class="search-action-btn hidden" title="Clear search" aria-label="Clear search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </button>
+          <button id="voice-btn" class="search-action-btn" title="Search by voice" aria-label="Voice search">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 14 0h-2zm-5 9a7 7 0 0 0 7-7h-2a5 5 0 0 1-10 0H5a7 7 0 0 0 7 7z"/>
+            </svg>
+          </button>
+        </div>
+        <!-- Search suggestions dropdown -->
+        <div id="search-suggestions" class="search-suggestions hidden" role="listbox" aria-label="Search suggestions"></div>
+        <!-- Engine picker dropdown -->
+        <div id="engine-dropdown" class="hidden">
+          <div class="dropdown-label">Search with</div>
+          <div class="engine-opt" data-engine="google">
+            <img src="https://www.google.com/favicon.ico" width="16" height="16" alt="">
+            <span>Google</span>
+            <span class="engine-check hidden">✓</span>
+          </div>
+          <div class="engine-opt" data-engine="brave">
+            <img src="https://brave.com/favicon.ico" width="16" height="16" alt="">
+            <span>Brave Search</span>
+            <span class="engine-check hidden">✓</span>
+          </div>
+          <div class="engine-opt" data-engine="bing">
+            <img src="https://www.bing.com/favicon.ico" width="16" height="16" alt="">
+            <span>Bing</span>
+            <span class="engine-check hidden">✓</span>
+          </div>
+          <div class="engine-opt" data-engine="duckduckgo">
+            <img src="https://duckduckgo.com/favicon.ico" width="16" height="16" alt="">
+            <span>DuckDuckGo</span>
+            <span class="engine-check hidden">✓</span>
+          </div>
+          <div class="engine-opt" data-engine="qwant">
+            <img src="https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.qwant.com&size=256" width="16" height="16" alt="">
+            <span>Qwant</span>
+            <span class="engine-check hidden">✓</span>
+          </div>
+          <div class="engine-opt" data-engine="yahoo">
+            <img src="https://www.yahoo.com/favicon.ico" width="16" height="16" alt="">
+            <span>Yahoo Search</span>
+            <span class="engine-check hidden">✓</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shortcuts -->
+    <div id="shortcuts-section">
+      <div id="shortcuts-controls">
+        <button class="view-btn active" id="view-row-btn" title="Row view" aria-label="Switch to row view">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="3" y="5" width="18" height="4" rx="1"/>
+            <rect x="3" y="11" width="18" height="4" rx="1"/>
+            <rect x="3" y="17" width="18" height="4" rx="1"/>
+          </svg>
+        </button>
+        <button class="view-btn" id="view-grid-btn" title="Grid view" aria-label="Switch to grid view">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="3" y="3" width="8" height="8" rx="1"/>
+            <rect x="13" y="3" width="8" height="8" rx="1"/>
+            <rect x="3" y="13" width="8" height="8" rx="1"/>
+            <rect x="13" y="13" width="8" height="8" rx="1"/>
+          </svg>
+        </button>
+      </div>
+      <div id="shortcuts-container" class="row-view" role="list" aria-label="Shortcuts"></div>
+    </div>
+
+  </main>
+
+  <!-- Bottom Bar -->
+  <footer id="bottom-bar">
+    <div id="photo-credit"></div>
+    <button id="customize-btn" aria-label="Customize this page">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+      </svg>
+      Customize
+    </button>
+  </footer>
+
+  <!-- Backdrop (closes floating panels) -->
+  <div id="backdrop" class="hidden" aria-hidden="true"></div>
+
+  <!-- ===== ACCOUNT PANEL ===== -->
+  <div id="account-panel" class="floating-panel hidden" role="dialog" aria-label="Account switcher">
+    <!-- Rendered by JS -->
+  </div>
+
+  <!-- ===== APPS PANEL ===== -->
+  <div id="apps-panel" class="floating-panel hidden" role="dialog" aria-label="Google apps">
+    <div class="apps-panel-title">Your favorites</div>
+    <div id="apps-grid"></div>
+  </div>
+
+  <!-- ===== CUSTOMIZE SIDE PANEL ===== -->
+  <div id="customize-panel" class="side-panel hidden" role="dialog" aria-label="Customize">
+    <div class="side-panel-header">
+      <h2>Customize</h2>
+      <button class="close-btn" id="customize-close" aria-label="Close customize panel">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="side-panel-tabs" role="tablist">
+      <button class="sp-tab active" data-tab="backgrounds" role="tab">Backgrounds</button>
+      <button class="sp-tab" data-tab="shortcuts" role="tab">Shortcuts</button>
+      <button class="sp-tab" data-tab="search" role="tab">Search</button>
+      <button class="sp-tab" data-tab="accounts" role="tab">Accounts</button>
+      <button class="sp-tab" data-tab="appearance" role="tab">Appearance</button>
+    </div>
+    <div class="side-panel-body">
+
+      <!-- Backgrounds Tab -->
+      <div class="sp-content active" id="tab-backgrounds">
+        <div class="sp-section-label">Curated</div>
+        <div id="curated-grid" class="bg-picker-grid"></div>
+        <div class="sp-section-label" style="margin-top:18px">Solid Color</div>
+        <div id="color-swatches" class="color-swatch-row">
+          <div class="color-swatch" data-color="#1a1a2e" style="background:#1a1a2e"></div>
+          <div class="color-swatch" data-color="#0f3460" style="background:#0f3460"></div>
+          <div class="color-swatch" data-color="#16213e" style="background:#16213e"></div>
+          <div class="color-swatch" data-color="#1b1b1b" style="background:#1b1b1b"></div>
+          <div class="color-swatch" data-color="#0d1b2a" style="background:#0d1b2a"></div>
+          <div class="color-swatch" data-color="#2d1b69" style="background:#2d1b69"></div>
+          <div class="color-swatch" data-color="#001524" style="background:#001524"></div>
+          <div class="color-swatch" data-color="#ffffff" style="background:#fff;border:1px solid #ccc"></div>
+          <input type="color" id="custom-color-picker" title="Custom color" style="opacity:0;position:absolute;width:0;height:0">
+          <button class="color-swatch color-custom-btn" id="custom-color-btn" title="Custom color">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4v16m8-8H4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <div class="sp-section-label" style="margin-top:18px">Upload</div>
+        <div id="upload-zone">
+          <input type="file" id="bg-upload" accept="image/*" style="display:none">
+          <button id="bg-upload-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13v6H5v-6H3v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6h-2zm-7-9l-4 4h3v8h2V8h3l-4-4z"/></svg>
+            Choose a photo from your device
+          </button>
+          <div id="uploaded-preview" class="hidden"></div>
+        </div>
+      </div>
+
+      <!-- Shortcuts Tab -->
+      <div class="sp-content" id="tab-shortcuts">
+        <div class="sp-section-label">Your shortcuts</div>
+        <div id="shortcuts-list"></div>
+        <button class="sp-action-btn" id="add-shortcut-sp-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4v16m8-8H4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+          Add shortcut
+        </button>
+      </div>
+
+      <!-- Search Tab -->
+      <div class="sp-content" id="tab-search">
+        <div class="sp-section-label">Default search engine</div>
+        <div id="search-engine-list">
+          <div class="engine-list-item" data-engine="google">
+            <img src="https://www.google.com/favicon.ico" width="20" height="20" alt="">
+            <div>
+              <div class="engine-name">Google</div>
+              <div class="engine-url">google.com</div>
+            </div>
+            <span class="engine-radio"></span>
+          </div>
+          <div class="engine-list-item" data-engine="brave">
+            <img src="https://brave.com/favicon.ico" width="20" height="20" alt="">
+            <div>
+              <div class="engine-name">Brave Search</div>
+              <div class="engine-url">search.brave.com</div>
+            </div>
+            <span class="engine-radio"></span>
+          </div>
+          <div class="engine-list-item" data-engine="bing">
+            <img src="https://www.bing.com/favicon.ico" width="20" height="20" alt="">
+            <div>
+              <div class="engine-name">Bing</div>
+              <div class="engine-url">bing.com</div>
+            </div>
+            <span class="engine-radio"></span>
+          </div>
+          <div class="engine-list-item" data-engine="duckduckgo">
+            <img src="https://duckduckgo.com/favicon.ico" width="20" height="20" alt="">
+            <div>
+              <div class="engine-name">DuckDuckGo</div>
+              <div class="engine-url">duckduckgo.com</div>
+            </div>
+            <span class="engine-radio"></span>
+          </div>
+          <div class="engine-list-item" data-engine="qwant">
+            <img src="https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.qwant.com&size=256" width="20" height="20" alt="">
+            <div>
+              <div class="engine-name">Qwant</div>
+              <div class="engine-url">qwant.com</div>
+            </div>
+            <span class="engine-radio"></span>
+          </div>
+          <div class="engine-list-item" data-engine="yahoo">
+            <img src="https://www.yahoo.com/favicon.ico" width="20" height="20" alt="">
+            <div>
+              <div class="engine-name">Yahoo Search</div>
+              <div class="engine-url">search.yahoo.com</div>
+            </div>
+            <span class="engine-radio"></span>
+          </div>
+        </div>
+
+        <div class="sp-section-label" style="margin-top:24px">Voice search</div>
+        <div class="sp-setting-row">
+          <div class="sp-setting-info">
+            <div class="sp-setting-title">Show voice search button</div>
+            <div class="sp-setting-desc">Display microphone button in search bar</div>
+          </div>
+          <label class="sp-toggle-switch" aria-label="Show voice search button">
+            <input type="checkbox" id="voice-btn-toggle" checked>
+            <span class="sp-toggle-slider"></span>
+          </label>
+        </div>
+        <div class="sp-setting-row sp-setting-col" style="margin-top:10px">
+          <div class="sp-setting-info">
+            <div class="sp-setting-title">Voice search language</div>
+            <div class="sp-setting-desc">Spoken language for speech recognition</div>
+          </div>
+          <div class="sp-select-wrapper">
+            <select id="voice-lang-select" class="sp-select" aria-label="Voice search language"></select>
+            <svg class="sp-select-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accounts Tab -->
+      <div class="sp-content" id="tab-accounts">
+        <div class="sp-section-label">Gmail accounts</div>
+        <p class="sp-hint">Accounts are managed manually. Set each account's Gmail URL index to match the order you're signed in to Google (0 = first, 1 = second, etc.)</p>
+        <div id="accounts-list"></div>
+        <button class="sp-action-btn" id="add-account-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4v16m8-8H4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+          Add account
+        </button>
+      </div>
+
+      <!-- Appearance Tab -->
+      <div class="sp-content" id="tab-appearance">
+        <div class="sp-section-label">Theme</div>
+        <div class="appearance-options">
+          <button class="appearance-opt" data-theme="auto" aria-label="Auto Theme">
+            <div class="theme-circle">
+              <img src="assets/themes/theme_black_white.png" alt="Auto Theme" class="theme-thumb-img" />
+            </div>
+            <span>Auto</span>
+          </button>
+          <button class="appearance-opt" data-theme="dark" aria-label="Dark Theme">
+            <div class="theme-circle">
+              <img src="assets/themes/theme_black.png" alt="Dark Theme" class="theme-thumb-img" />
+            </div>
+            <span>Dark</span>
+          </button>
+          <button class="appearance-opt" data-theme="light" aria-label="Light Theme">
+            <div class="theme-circle">
+              <img src="assets/themes/theme_white.png" alt="Light Theme" class="theme-thumb-img" />
+            </div>
+            <span>Light</span>
+          </button>
+        </div>
+
+        <div class="sp-section-label" style="margin-top:24px">Browser Footer</div>
+        <p class="sp-hint" style="margin-bottom:12px">Chromium browsers may show a bottom footer bar with a duplicate "Customize" button. You can permanently hide it in one click.</p>
+        <button class="sp-action-btn" id="open-footer-guide-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          How to hide browser footer
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== SHORTCUT MODAL ===== -->
+  <div id="shortcut-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Edit shortcut">
+    <div id="shortcut-modal-box">
+      <div class="modal-header">
+        <h3 id="shortcut-modal-title">Add shortcut</h3>
+        <button class="close-btn" id="shortcut-modal-close" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <label class="modal-field">
+        <span>Name</span>
+        <input type="text" id="shortcut-name-input" placeholder="Shortcut name" maxlength="60">
+      </label>
+      <label class="modal-field">
+        <span>URL</span>
+        <input type="url" id="shortcut-url-input" placeholder="https://example.com">
+      </label>
+      <div class="modal-actions">
+        <button class="modal-btn secondary" id="shortcut-cancel-btn">Cancel</button>
+        <button class="modal-btn primary" id="shortcut-save-btn">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ACCOUNT MODAL ===== -->
+  <div id="account-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Add account">
+    <div id="account-modal-box">
+      <div class="modal-header">
+        <h3 id="account-modal-title">Add Google Account</h3>
+        <button class="close-btn" id="account-modal-close" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Main Option: Google Sign-in / Auto Sync -->
+      <div id="acc-google-section" class="acc-modal-section">
+        <button type="button" class="acc-google-signin-btn" id="acc-google-signin-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span id="acc-google-btn-text">Sign in with Google</span>
+        </button>
+        <p class="acc-section-hint">Redirects to Google to sign in or create an account. Your accounts and profile photo will automatically refresh upon return.</p>
+      </div>
+
+      <!-- Divider -->
+      <div id="acc-modal-divider" class="acc-modal-divider">
+        <span>OR ADD MANUALLY</span>
+      </div>
+
+      <!-- Fallback Option: Manual Form -->
+      <div id="acc-manual-section">
+        <label class="modal-field">
+          <span>Display name</span>
+          <input type="text" id="acc-name-input" placeholder="e.g. Alex" maxlength="40">
+        </label>
+        <label class="modal-field">
+          <span>Gmail address</span>
+          <input type="email" id="acc-email-input" placeholder="you@gmail.com">
+        </label>
+        <label class="modal-field">
+          <span>Gmail URL index</span>
+          <input type="number" id="acc-index-input" min="0" max="9" value="0">
+          <div class="acc-index-tip">
+            Open Gmail in your browser and look at the URL bar.<br>
+            It shows <code>mail.google.com/mail/u/<b>N</b>/</code> — enter that <b>N</b> here.<br>
+            Your first signed-in Google account = <code>0</code>, second = <code>1</code>, etc.
+          </div>
+        </label>
+        <label class="modal-field">
+          <span>Profile Picture (optional)</span>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+            <input type="url" id="acc-avatar-input" placeholder="Google photo URL or image link" style="flex:1">
+            <button type="button" class="sp-action-btn" id="acc-avatar-upload-btn" style="margin:0;padding:8px 12px;font-size:12px;white-space:nowrap;width:auto">Upload</button>
+            <input type="file" id="acc-avatar-file" accept="image/*" class="hidden">
+          </div>
+        </label>
+        <label class="modal-field">
+          <span>Avatar fallback color</span>
+          <div id="acc-color-picker-row">
+            <div class="acc-color-opt" data-color="#4285F4" style="background:#4285F4"></div>
+            <div class="acc-color-opt" data-color="#EA4335" style="background:#EA4335"></div>
+            <div class="acc-color-opt" data-color="#34A853" style="background:#34A853"></div>
+            <div class="acc-color-opt" data-color="#FBBC04" style="background:#FBBC04"></div>
+            <div class="acc-color-opt" data-color="#00BCD4" style="background:#00BCD4"></div>
+            <div class="acc-color-opt" data-color="#9C27B0" style="background:#9C27B0"></div>
+            <div class="acc-color-opt" data-color="#FF5722" style="background:#FF5722"></div>
+            <div class="acc-color-opt" data-color="#607D8B" style="background:#607D8B"></div>
+          </div>
+        </label>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn secondary" id="account-cancel-btn">Cancel</button>
+        <button class="modal-btn primary" id="account-save-btn">Add Manually</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== VOICE SEARCH MODAL ===== -->
+  <div id="voice-overlay" class="modal hidden" role="dialog" aria-modal="true" aria-label="Voice search">
+    <div id="voice-modal-box">
+      <div class="voice-modal-header">
+        <!-- Voice Language Selector Chip & Dropdown -->
+        <div class="voice-lang-picker" id="voice-lang-picker">
+          <button class="voice-lang-btn" id="voice-lang-btn" type="button" aria-haspopup="listbox" aria-expanded="false" title="Change voice language">
+            <svg class="voice-globe-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+            <bdi id="voice-lang-current-label">Auto</bdi>
+            <svg class="voice-chevron-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="voice-lang-dropdown hidden" id="voice-lang-dropdown" role="listbox" aria-label="Select voice language">
+            <div class="voice-lang-search-box">
+              <input type="text" id="voice-lang-search-input" class="voice-lang-search-input" placeholder="Search language..." autocomplete="off" spellcheck="false">
+            </div>
+            <div class="voice-lang-list" id="voice-lang-list"></div>
+          </div>
+        </div>
+
+        <button class="close-btn" id="voice-close-btn" aria-label="Close voice search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="voice-status" id="voice-status" dir="auto">Listening...</div>
+      <div class="voice-pulse-container" id="voice-pulse-container">
+        <div class="voice-ring ring-1"></div>
+        <div class="voice-ring ring-2"></div>
+        <div class="voice-ring ring-3"></div>
+        <button class="voice-mic-circle" id="voice-mic-circle" title="Tap to speak" aria-label="Microphone">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 14 0h-2zm-5 9a7 7 0 0 0 7-7h-2a5 5 0 0 1-10 0H5a7 7 0 0 0 7 7z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="voice-transcript-box">
+        <p id="voice-transcript" class="voice-transcript-text" dir="auto">Say something...</p>
+      </div>
+      <div id="voice-error-box" class="voice-error-box hidden">
+        <p id="voice-error-text" class="voice-error-text" dir="auto"></p>
+        <button id="voice-grant-btn" class="modal-btn primary voice-grant-btn hidden">Grant Microphone Access</button>
+        <button id="voice-retry-btn" class="modal-btn primary voice-retry-btn">Try again</button>
+        <button id="voice-type-btn" class="modal-btn primary voice-type-btn hidden">Type search</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER ONBOARDING MODAL ===== -->
+  <div id="footer-onboarding-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Hide browser footer guide">
+    <div id="footer-onboarding-box" class="footer-onboarding-box">
+      <!-- Modal Header -->
+      <div class="modal-header fob-header">
+        <div class="fob-header-text">
+          <div class="fob-badge">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            <span>Chrome Quick Tip</span>
+          </div>
+          <h3 id="footer-onboarding-title">Hide the Browser Footer Bar</h3>
+          <p class="fob-subtitle">Chrome 138+ adds a native bottom bar that duplicates the customize button. Follow this 1-step guide to permanently hide it for a full-screen experience:</p>
+        </div>
+        <button class="close-btn" id="footer-onboarding-close" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Steps Card (Method 1) -->
+      <div class="fob-steps-card">
+        <div class="fob-step">
+          <div class="fob-step-badge">1</div>
+          <div class="fob-step-content">
+            <span class="fob-step-title">Right-click directly on the browser's bottom footer bar</span>
+            <span class="fob-step-desc">Right-click anywhere on the gray bar or the native &ldquo;Customize Chrome&rdquo; button at the bottom edge of your screen.</span>
+          </div>
+        </div>
+        <div class="fob-step-connector"></div>
+        <div class="fob-step">
+          <div class="fob-step-badge">2</div>
+          <div class="fob-step-content">
+            <span class="fob-step-title">Click &ldquo;Hide footer on New Tab page&rdquo;</span>
+            <span class="fob-step-desc">Select this option from the menu. Chrome will hide the footer permanently across all new tabs.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Context Menu Preview / Illustration -->
+      <div class="fob-preview-container" aria-hidden="true">
+        <div class="fob-mockup-window">
+          <div class="fob-mockup-tab-area">
+            <div class="fob-mockup-pill-btn">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+              </svg>
+              <span>Customize</span>
+            </div>
+            <span class="fob-mockup-hint-text">Horizon New Tab</span>
+          </div>
+          <!-- Simulated native browser footer -->
+          <div class="fob-mockup-native-bar">
+            <div class="fob-mockup-native-label">
+              <span class="fob-native-dot"></span>
+              <span>Browser bottom footer bar</span>
+            </div>
+            <div class="fob-mockup-native-btn">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
+              <span>Customize Chrome</span>
+            </div>
+            <!-- Simulated context menu -->
+            <div class="fob-sim-context-menu">
+              <div class="fob-sim-item">Hide shortcuts</div>
+              <div class="fob-sim-item fob-sim-item-highlight">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Hide footer on New Tab page</span>
+                <span class="fob-sim-click-badge">Click</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Distinction Section -->
+      <div class="fob-distinction-wrapper">
+        <div class="fob-distinction-col fob-col-keep">
+          <div class="fob-dist-head">
+            <span class="fob-dist-badge fob-badge-green">Keep this</span>
+            <span class="fob-dist-label">Horizon Customize</span>
+          </div>
+          <div class="fob-dist-example">
+            <div class="fob-pill-demo">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+              </svg>
+              <span>Customize</span>
+            </div>
+          </div>
+          <p class="fob-dist-desc">Horizon's floating glass pill opens your wallpapers, search settings, shortcuts, and themes.</p>
+        </div>
+
+        <div class="fob-distinction-col fob-col-hide">
+          <div class="fob-dist-head">
+            <span class="fob-dist-badge fob-badge-amber">Right-click & hide</span>
+            <span class="fob-dist-label">Browser Bottom Bar</span>
+          </div>
+          <div class="fob-dist-example">
+            <div class="fob-native-demo">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
+              <span>Customize Chrome</span>
+            </div>
+          </div>
+          <p class="fob-dist-desc">Chrome's extra native toolbar at the bottom of the window. Hide it for a distraction-free view.</p>
+        </div>
+      </div>
+
+      <!-- Modal Actions -->
+      <div class="modal-actions fob-actions">
+        <button class="modal-btn secondary" id="footer-onboarding-dismiss-btn">Remind Me Later</button>
+        <button class="modal-btn primary" id="footer-onboarding-done-btn">Got It, I've Hidden It</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Context Menu -->
+  <div id="context-menu" class="hidden" role="menu">
+    <div class="ctx-item" id="ctx-edit" role="menuitem">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Edit shortcut
+    </div>
+    <div class="ctx-item ctx-danger" id="ctx-delete" role="menuitem">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4h6v2"/></svg>
+      Remove
+    </div>
+  </div>
+
+  <script src="newtab.js"></script>
+</body>
+</html>
+

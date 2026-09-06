@@ -2897,12 +2897,6 @@ function closeFooterOnboardingModal() {
 
 async function checkFooterOnboarding() {
   if (state.hasSeenFooterOnboarding) return;
-  const isBrave = isBraveSync() || (await isBraveBrowser());
-  if (isBrave) {
-    state.hasSeenFooterOnboarding = true;
-    saveState();
-    return;
-  }
   setTimeout(() => {
     openFooterOnboardingModal();
   }, 350);

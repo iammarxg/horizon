@@ -504,64 +504,58 @@
         <div class="fob-header-text">
           <div class="fob-badge">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
             </svg>
-            <span>Chrome Quick Tip</span>
+            <span>Quick Tip</span>
           </div>
           <h3 id="footer-onboarding-title">Hide the Browser Footer Bar</h3>
-          <p class="fob-subtitle">Chrome 138+ adds a native bottom bar that duplicates the customize button. Follow this 1-step guide to permanently hide it for a full-screen experience:</p>
+          <p class="fob-subtitle">Browsers show a default toolbar at the bottom of new tabs. You can permanently hide it in two simple clicks:</p>
         </div>
         <button class="close-btn" id="footer-onboarding-close" aria-label="Close">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
       </div>
 
-      <!-- Steps Card (Method 1) -->
+      <!-- Straight to the point 2-step card -->
       <div class="fob-steps-card">
         <div class="fob-step">
           <div class="fob-step-badge">1</div>
           <div class="fob-step-content">
-            <span class="fob-step-title">Right-click directly on the browser's bottom footer bar</span>
-            <span class="fob-step-desc">Right-click anywhere on the gray bar or the native &ldquo;Customize Chrome&rdquo; button at the bottom edge of your screen.</span>
+            <span class="fob-step-title"><strong>Right-click</strong> on the bar at the bottom of your screen</span>
+            <span class="fob-step-desc">Right-click anywhere on the gray bottom footer bar (or its "Customize" button).</span>
           </div>
         </div>
         <div class="fob-step-connector"></div>
         <div class="fob-step">
           <div class="fob-step-badge">2</div>
           <div class="fob-step-content">
-            <span class="fob-step-title">Click &ldquo;Hide footer on New Tab page&rdquo;</span>
-            <span class="fob-step-desc">Select this option from the menu. Chrome will hide the footer permanently across all new tabs.</span>
+            <span class="fob-step-title">Click <strong>&ldquo;Hide footer on New Tab page&rdquo;</strong></span>
+            <span class="fob-step-desc">The browser permanently hides the bottom bar across all new tabs.</span>
           </div>
         </div>
       </div>
 
-      <!-- Context Menu Preview / Illustration -->
+      <!-- Visual Context Menu Simulation -->
       <div class="fob-preview-container" aria-hidden="true">
         <div class="fob-mockup-window">
-          <div class="fob-mockup-tab-area">
-            <div class="fob-mockup-pill-btn">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-              </svg>
-              <span>Customize</span>
-            </div>
-            <span class="fob-mockup-hint-text">Horizon New Tab</span>
+          <div class="fob-mockup-screen-hint">
+            <span>Bottom edge of your browser window</span>
           </div>
-          <!-- Simulated native browser footer -->
           <div class="fob-mockup-native-bar">
-            <div class="fob-mockup-native-label">
-              <span class="fob-native-dot"></span>
-              <span>Browser bottom footer bar</span>
+            <div class="fob-mockup-bar-target">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path>
+              </svg>
+              <span>Right-click anywhere along the bottom bar &rarr;</span>
             </div>
-            <div class="fob-mockup-native-btn">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
-              <span>Customize Chrome</span>
-            </div>
-            <!-- Simulated context menu -->
+            <!-- Simulated popup menu -->
             <div class="fob-sim-context-menu">
               <div class="fob-sim-item">Hide shortcuts</div>
               <div class="fob-sim-item fob-sim-item-highlight">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
                 <span>Hide footer on New Tab page</span>
@@ -572,37 +566,13 @@
         </div>
       </div>
 
-      <!-- Distinction Section -->
-      <div class="fob-distinction-wrapper">
-        <div class="fob-distinction-col fob-col-keep">
-          <div class="fob-dist-head">
-            <span class="fob-dist-badge fob-badge-green">Keep this</span>
-            <span class="fob-dist-label">Horizon Customize</span>
-          </div>
-          <div class="fob-dist-example">
-            <div class="fob-pill-demo">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-              </svg>
-              <span>Customize</span>
-            </div>
-          </div>
-          <p class="fob-dist-desc">Horizon's floating glass pill opens your wallpapers, search settings, shortcuts, and themes.</p>
-        </div>
-
-        <div class="fob-distinction-col fob-col-hide">
-          <div class="fob-dist-head">
-            <span class="fob-dist-badge fob-badge-amber">Right-click & hide</span>
-            <span class="fob-dist-label">Browser Bottom Bar</span>
-          </div>
-          <div class="fob-dist-example">
-            <div class="fob-native-demo">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
-              <span>Customize Chrome</span>
-            </div>
-          </div>
-          <p class="fob-dist-desc">Chrome's extra native toolbar at the bottom of the window. Hide it for a distraction-free view.</p>
-        </div>
+      <!-- Reassurance Card -->
+      <div class="fob-note-card">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        <span>Your floating <strong>Horizon Customize</strong> button on the right stays active for all settings and wallpapers.</span>
       </div>
 
       <!-- Modal Actions -->

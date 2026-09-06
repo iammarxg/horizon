@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://chromewebstore.google.com/detail/horizon-modern-new-tab/lcmbbnjaajbpdjadlcipfnoghfmlgdhd"><img src="https://img.shields.io/badge/Chrome_Web_Store-v1.0.0-4285F4?style=flat&logo=googlechrome&logoColor=white" alt="Chrome Web Store"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/License-AGPL_v3-7bb026?style=flat" alt="License: AGPL v3"></a>
+  <a href="https://chromewebstore.google.com/detail/horizon-modern-new-tab/lcmbbnjaajbpdjadlcipfnoghfmlgdhd"><img src="https://img.shields.io/badge/Chrome_Web_Store-v1.0.1-4285F4?style=flat&logo=googlechrome&logoColor=white" alt="Chrome Web Store"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/License-AGPL_v3-7bb026?style=flat" alt="License: AGPL v3"></a>
 </p>
 
 <p align="center">

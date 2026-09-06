@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Horizon: Modern New Tab",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A premium, customizable new tab page for Chrome, Brave, and Chromium browsers.",
   "chrome_url_overrides": {
     "newtab": "newtab.html"

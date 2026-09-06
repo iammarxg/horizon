@@ -1934,36 +1934,13 @@ body.theme-light .fob-mockup-window {
   background: rgba(0, 0, 0, 0.04);
 }
 
-.fob-mockup-tab-area {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.fob-mockup-screen-hint {
   padding: 8px 12px;
-  border-bottom: 1px dashed var(--panel-divider);
-}
-
-.fob-mockup-hint-text {
   font-size: 11px;
   font-weight: 500;
   color: var(--panel-text-sub);
-  letter-spacing: 0.03em;
-}
-
-.fob-mockup-pill-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 9px;
-  border-radius: var(--radius-full);
-  background: var(--customize-bg);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: var(--customize-text);
-  font-size: 11px;
-  font-weight: 500;
-  backdrop-filter: blur(8px);
-}
-body.theme-light .fob-mockup-pill-btn {
-  border-color: rgba(0, 0, 0, 0.12);
+  letter-spacing: 0.02em;
+  border-bottom: 1px dashed var(--panel-divider);
 }
 
 .fob-mockup-native-bar {
@@ -1971,8 +1948,8 @@ body.theme-light .fob-mockup-pill-btn {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 7px 12px;
-  margin: 6px 6px 0;
+  padding: 10px 14px;
+  margin: 8px 8px 0;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-sm);
@@ -1982,42 +1959,23 @@ body.theme-light .fob-mockup-native-bar {
   border-color: rgba(0, 0, 0, 0.08);
 }
 
-.fob-mockup-native-label {
+.fob-mockup-bar-target {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 11px;
+  gap: 8px;
+  font-size: 11.5px;
+  font-weight: 500;
   color: var(--panel-text-sub);
 }
-
-.fob-native-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #ea8600;
-}
-
-.fob-mockup-native-btn {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 8px;
-  border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: var(--panel-text);
-  font-size: 10.5px;
-}
-body.theme-light .fob-mockup-native-btn {
-  background: rgba(0, 0, 0, 0.06);
-  border-color: rgba(0, 0, 0, 0.10);
+.fob-mockup-bar-target svg {
+  color: var(--accent);
 }
 
 .fob-sim-context-menu {
   position: absolute;
-  right: 12px;
-  bottom: 32px;
-  width: 245px;
+  right: 14px;
+  bottom: 34px;
+  width: 250px;
   background: var(--ctx-bg);
   border: 1px solid var(--panel-border);
   border-radius: var(--radius-sm);
@@ -2034,7 +1992,7 @@ body.theme-light .fob-mockup-native-btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 5px 8px;
+  padding: 6px 9px;
   border-radius: 5px;
   font-size: 11.5px;
   color: var(--panel-text-sub);
@@ -2055,128 +2013,30 @@ body.theme-light .fob-mockup-native-btn {
   letter-spacing: 0.04em;
   background: rgba(255, 255, 255, 0.25);
   color: #fff;
-  padding: 1px 5px;
+  padding: 1px 6px;
   border-radius: 3px;
 }
 
-/* Distinction Grid */
-.fob-distinction-wrapper {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.fob-distinction-col {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 10px 12px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--panel-divider);
-  background: var(--panel-item-hover);
-}
-
-.fob-col-keep {
-  border-color: rgba(52, 168, 83, 0.35);
-  background: rgba(52, 168, 83, 0.05);
-}
-
-.fob-col-hide {
-  border-color: rgba(234, 134, 0, 0.35);
-  background: rgba(234, 134, 0, 0.05);
-}
-
-.fob-dist-head {
+/* Reassurance Note Card */
+.fob-note-card {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-}
-
-.fob-dist-label {
-  font-size: 11.5px;
-  font-weight: 600;
+  gap: 10px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  border-radius: var(--radius-md);
+  padding: 11px 14px;
+  font-size: 12px;
+  line-height: 1.45;
   color: var(--panel-text);
 }
-
-.fob-dist-badge {
-  font-size: 9.5px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: var(--radius-full);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+.fob-note-card svg {
+  flex-shrink: 0;
+  color: #10b981;
 }
-
-.fob-badge-green {
-  background: rgba(52, 168, 83, 0.2);
-  color: #34a853;
-  border: 1px solid rgba(52, 168, 83, 0.35);
-}
-body.theme-light .fob-badge-green {
-  background: rgba(52, 168, 83, 0.15);
-  color: #1e8e3e;
-}
-
-.fob-badge-amber {
-  background: rgba(234, 134, 0, 0.2);
-  color: #f29900;
-  border: 1px solid rgba(234, 134, 0, 0.35);
-}
-body.theme-light .fob-badge-amber {
-  background: rgba(234, 134, 0, 0.15);
-  color: #b06000;
-}
-
-.fob-dist-example {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 34px;
-  border-radius: var(--radius-sm);
-  background: rgba(0, 0, 0, 0.15);
-}
-body.theme-light .fob-dist-example {
-  background: rgba(0, 0, 0, 0.04);
-}
-
-.fob-pill-demo {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
-  background: var(--customize-bg);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: var(--customize-text);
-  font-size: 11px;
-  font-weight: 500;
-  box-shadow: var(--shadow-sm);
-}
-body.theme-light .fob-pill-demo {
-  border-color: rgba(0, 0, 0, 0.12);
-}
-
-.fob-native-demo {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 9px;
-  border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: var(--panel-text-sub);
-  font-size: 11px;
-}
-body.theme-light .fob-native-demo {
-  background: rgba(0, 0, 0, 0.06);
-  border-color: rgba(0, 0, 0, 0.10);
-}
-
-.fob-dist-desc {
-  font-size: 11px;
-  line-height: 1.4;
-  color: var(--panel-text-sub);
+.fob-note-card strong {
+  color: var(--panel-text);
+  font-weight: 600;
 }
 
 .fob-actions {
@@ -2188,9 +2048,6 @@ body.theme-light .fob-native-demo {
   .footer-onboarding-box {
     padding: 18px 16px;
     border-radius: var(--radius-lg);
-  }
-  .fob-distinction-wrapper {
-    grid-template-columns: 1fr;
   }
   .fob-sim-context-menu {
     width: auto;

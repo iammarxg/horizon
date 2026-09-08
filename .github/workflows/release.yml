@@ -2,8 +2,6 @@ name: Release Horizon Extension
 
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v*'
   workflow_dispatch:
@@ -66,6 +64,7 @@ jobs:
           name: Horizon ${{ steps.vars.outputs.tag }}
           body_path: RELEASE_NOTES.md
           files: releases/*.zip
+          fail_on_unmatched_files: true
           draft: false
           prerelease: false
         env:

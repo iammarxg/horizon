@@ -1,24 +1,20 @@
 {
   "manifest_version": 3,
   "name": "Horizon: Modern New Tab",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A premium, customizable new tab page for Chrome, Brave, and Chromium browsers.",
   "chrome_url_overrides": {
     "newtab": "newtab.html"
   },
   "offline_enabled": true,
   "permissions": [
-    "storage"
+    "storage",
+    "search"
   ],
   "host_permissions": [
     "https://*.google.com/*",
     "https://*.googleusercontent.com/*",
-    "https://suggestqueries.google.com/*",
-    "https://search.brave.com/*",
-    "https://api.bing.com/*",
-    "https://duckduckgo.com/*",
-    "https://api.qwant.com/*",
-    "https://ff.search.yahoo.com/*"
+    "https://suggestqueries.google.com/*"
   ],
   "background": {
     "service_worker": "background.js"

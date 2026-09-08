@@ -14,7 +14,6 @@ chrome.runtime.onInstalled.addListener(async (details) => {
         { id: "s4", name: "GitHub", url: "https://github.com" },
       ],
       shortcutsView: "row",
-      searchEngine: "google",
       background: { type: "curated", index: 0 },
       themeOverride: "auto",
       voiceLang: "auto",

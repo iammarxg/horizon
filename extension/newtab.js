@@ -42,44 +42,7 @@ const CURATED_BACKGROUNDS = [
     full:  'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?w=1920&q=85&auto=format&fit=crop' },
 ];
 
-const SEARCH_ENGINES = {
-  google: {
-    name: 'Google',
-    url: 'https://www.google.com/search?q=',
-    suggestUrl: (q) => `https://suggestqueries.google.com/complete/search?client=chrome&q=${encodeURIComponent(q)}`,
-    icon: 'https://www.google.com/favicon.ico'
-  },
-  brave: {
-    name: 'Brave Search',
-    url: 'https://search.brave.com/search?q=',
-    suggestUrl: (q) => `https://search.brave.com/api/suggest?q=${encodeURIComponent(q)}`,
-    icon: 'https://brave.com/favicon.ico'
-  },
-  bing: {
-    name: 'Bing',
-    url: 'https://www.bing.com/search?q=',
-    suggestUrl: (q) => `https://api.bing.com/osjson.aspx?query=${encodeURIComponent(q)}`,
-    icon: 'https://www.bing.com/favicon.ico'
-  },
-  duckduckgo: {
-    name: 'DuckDuckGo',
-    url: 'https://duckduckgo.com/?q=',
-    suggestUrl: (q) => `https://duckduckgo.com/ac/?type=list&q=${encodeURIComponent(q)}`,
-    icon: 'https://duckduckgo.com/favicon.ico'
-  },
-  qwant: {
-    name: 'Qwant',
-    url: 'https://www.qwant.com/?q=',
-    suggestUrl: (q) => `https://api.qwant.com/v3/suggest?client=opensearch&q=${encodeURIComponent(q)}`,
-    icon: 'https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.qwant.com&size=256'
-  },
-  yahoo: {
-    name: 'Yahoo Search',
-    url: 'https://search.yahoo.com/search?p=',
-    suggestUrl: (q) => `https://ff.search.yahoo.com/gossip?output=json&command=${encodeURIComponent(q)}`,
-    icon: 'https://www.yahoo.com/favicon.ico'
-  },
-};
+
 
 // ── Google Apps — 42 services with local bundled assets & account routing
 const GOOGLE_APPS = [
@@ -716,7 +679,6 @@ const DEFAULT_STATE = {
   activeAccountId: null,
   shortcuts:       [],
   shortcutsView:   'row',
-  searchEngine:    'google',
   background:      { type:'curated', index:0 },
   themeOverride:   'auto',
   customUploadedBg: null,
@@ -1170,43 +1132,41 @@ async function fetchAndRenderSuggestions(query) {
   suggestAbortController = new AbortController();
   const signal = suggestAbortController.signal;
 
-  const eng = SEARCH_ENGINES[state.searchEngine] || SEARCH_ENGINES.google;
   let queryMatches = [];
 
-  if (eng.suggestUrl) {
-    try {
-      const res = await fetch(eng.suggestUrl(qTrim), {
-        signal,
-        headers: { 'Accept': 'application/json, text/javascript, */*' }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        const parsed = parseEngineSuggestions(data);
-        const seen = new Set(shortcutMatches.map(s => s.displayText.toLowerCase()));
-        queryMatches = parsed
-          .filter(text => {
-            if (typeof text !== 'string' || !text.trim()) return false;
-            const t = text.trim();
-            const lower = t.toLowerCase();
-            if (seen.has(lower)) return false;
-            seen.add(lower);
-            return true;
-          })
-          .slice(0, 7)
-          .map(text => {
-            const t = text.trim();
-            const isUrl = /^https?:\/\/[^\s]+$/i.test(t);
-            return {
-              type: isUrl ? 'url' : 'query',
-              displayText: t,
-              query: t,
-              url: isUrl ? t : null
-            };
-          });
-      }
-    } catch (err) {
-      if (err.name === 'AbortError') return;
+  try {
+    const suggestUrl = `https://suggestqueries.google.com/complete/search?client=chrome&q=${encodeURIComponent(qTrim)}`;
+    const res = await fetch(suggestUrl, {
+      signal,
+      headers: { 'Accept': 'application/json, text/javascript, */*' }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const parsed = parseEngineSuggestions(data);
+      const seen = new Set(shortcutMatches.map(s => s.displayText.toLowerCase()));
+      queryMatches = parsed
+        .filter(text => {
+          if (typeof text !== 'string' || !text.trim()) return false;
+          const t = text.trim();
+          const lower = t.toLowerCase();
+          if (seen.has(lower)) return false;
+          seen.add(lower);
+          return true;
+        })
+        .slice(0, 7)
+        .map(text => {
+          const t = text.trim();
+          const isUrl = /^https?:\/\/[^\s]+$/i.test(t);
+          return {
+            type: isUrl ? 'url' : 'query',
+            displayText: t,
+            query: t,
+            url: isUrl ? t : null
+          };
+        });
     }
+  } catch (err) {
+    if (err.name === 'AbortError') return;
   }
 
   if (document.activeElement === document.getElementById('search-input')) {
@@ -1238,19 +1198,6 @@ function updateActiveSuggestionUI() {
   }
 }
 
-function updateEngineUI() {
-  const eng  = SEARCH_ENGINES[state.searchEngine] || SEARCH_ENGINES.google;
-  const icon = document.getElementById('engine-icon');
-  applyCachedFavicon(icon, eng.icon);
-  icon.alt = eng.name;
-  document.querySelectorAll('.engine-opt').forEach(opt => {
-    const chk = opt.querySelector('.engine-check');
-    if (chk) chk.classList.toggle('hidden', opt.dataset.engine !== state.searchEngine);
-  });
-  document.querySelectorAll('.engine-list-item').forEach(el =>
-    el.classList.toggle('active', el.dataset.engine === state.searchEngine));
-}
-
 function doSearch(q) {
   if (!q || !q.trim()) return;
   closeSuggestions();
@@ -1259,8 +1206,14 @@ function doSearch(q) {
     window.location.href = trimmed;
     return;
   }
-  const eng = SEARCH_ENGINES[state.searchEngine] || SEARCH_ENGINES.google;
-  window.location.href = eng.url + encodeURIComponent(trimmed);
+  if (typeof chrome !== 'undefined' && chrome.search && chrome.search.query) {
+    chrome.search.query({
+      text: trimmed,
+      disposition: 'CURRENT_TAB'
+    });
+  } else {
+    window.location.href = `https://www.google.com/search?q=${encodeURIComponent(trimmed)}`;
+  }
 }
 
 // ── Voice Search Dictation Module ─────────────────────────────
@@ -2137,7 +2090,6 @@ function showVoicePermissionPrompt() {
 
 async function openVoiceSearch() {
   closeSuggestions();
-  document.getElementById('engine-dropdown')?.classList.add('hidden');
 
   if (!voiceOverlayOpen) {
     preVoiceSearchQuery = document.getElementById('search-input')?.value || '';
@@ -2897,12 +2849,6 @@ function closeFooterOnboardingModal() {
 
 async function checkFooterOnboarding() {
   if (state.hasSeenFooterOnboarding) return;
-  const isBrave = isBraveSync() || (await isBraveBrowser());
-  if (isBrave) {
-    state.hasSeenFooterOnboarding = true;
-    saveState();
-    return;
-  }
   setTimeout(() => {
     openFooterOnboardingModal();
   }, 350);
@@ -3530,7 +3476,6 @@ function setupColorSwatches() {
 
 function openPanel(id) {
   closeSuggestions();
-  document.getElementById('engine-dropdown')?.classList.add('hidden');
   closeAllPanels(id);
   document.getElementById(id).classList.remove('hidden');
   document.getElementById('backdrop').classList.remove('hidden');
@@ -3555,7 +3500,6 @@ function closeAllPanels(except) {
 
 function openCustomizePanel() {
   closeSuggestions();
-  document.getElementById('engine-dropdown')?.classList.add('hidden');
   closeAllPanels('customize-panel');
   const panel = document.getElementById('customize-panel');
   panel.classList.remove('hidden');
@@ -3593,7 +3537,6 @@ function setupCustomizePanelTabs() {
       if (tab.dataset.tab === 'backgrounds') renderCuratedPicker();
       if (tab.dataset.tab === 'shortcuts')   renderShortcutsInPanel();
       if (tab.dataset.tab === 'accounts')    renderAccountsInPanel();
-      if (tab.dataset.tab === 'search')      updateEngineUI();
     });
   });
 }
@@ -3611,7 +3554,6 @@ function setupEventListeners() {
 
   searchInput.addEventListener('input', e => {
     const val = e.target.value;
-    document.getElementById('engine-dropdown')?.classList.add('hidden');
     if (searchClearBtn) {
       searchClearBtn.classList.toggle('hidden', val.length === 0);
     }
@@ -3821,31 +3763,6 @@ function setupEventListeners() {
     }, 120);
   });
 
-  // Engine dropdown toggle
-  document.getElementById('engine-btn').addEventListener('click', e => {
-    e.stopPropagation();
-    closeSuggestions();
-    document.getElementById('engine-dropdown').classList.toggle('hidden');
-  });
-  document.querySelectorAll('.engine-opt').forEach(opt => {
-    opt.addEventListener('click', () => {
-      state.searchEngine = opt.dataset.engine; saveState(); updateEngineUI();
-      document.getElementById('engine-dropdown').classList.add('hidden');
-      // If user had text in search input, refresh suggestions for new engine
-      if (searchInput.value.trim()) {
-        fetchAndRenderSuggestions(searchInput.value.trim());
-      }
-    });
-  });
-  document.querySelectorAll('.engine-list-item').forEach(el => {
-    el.addEventListener('click', () => {
-      state.searchEngine = el.dataset.engine; saveState(); updateEngineUI();
-      if (searchInput.value.trim()) {
-        fetchAndRenderSuggestions(searchInput.value.trim());
-      }
-    });
-  });
-
   // Shortcut view toggle
   document.getElementById('view-row-btn').addEventListener('click', () => {
     state.shortcutsView = 'row'; saveState(); renderShortcuts();
@@ -3884,11 +3801,6 @@ function setupEventListeners() {
 
   // Global dismiss
   document.addEventListener('click', e => {
-    const dd = document.getElementById('engine-dropdown');
-    if (!dd.classList.contains('hidden') &&
-        !dd.contains(e.target) &&
-        !document.getElementById('engine-btn').contains(e.target))
-      dd.classList.add('hidden');
     if (!document.getElementById('context-menu').contains(e.target))
       closeContextMenu();
     const searchSection = document.getElementById('search-section');
@@ -3913,7 +3825,6 @@ function setupEventListeners() {
       closeAllPanels(); closeCustomizePanel();
       closeShortcutModal(); closeAccountModal();
       closeFooterOnboardingModal();
-      document.getElementById('engine-dropdown').classList.add('hidden');
       closeContextMenu();
     }
     if (e.key === 'Enter' && voiceOverlayOpen) {
@@ -4084,7 +3995,6 @@ async function init() {
   applyTheme();
   startClock();
   applyBackground(null, true);
-  updateEngineUI();
   updateVoiceBtnVisibility();
   populateVoiceLangSelect();
   updateVoiceLangUI();

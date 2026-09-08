@@ -5,16 +5,16 @@
 </p>
 
 <p align="center">
-  <a href="https://chromewebstore.google.com/detail/horizon-modern-new-tab/lcmbbnjaajbpdjadlcipfnoghfmlgdhd"><img src="assets/badge-chrome-web-store.svg" alt="Available in the Chrome Web Store" height="48"></a>
+  <a href="https://chromewebstore.google.com/detail/horizon-modern-new-tab/lcmbbnjaajbpdjadlcipfnoghfmlgdhd"><img src="assets/available_chrome_web_store.png" alt="Available in the Chrome Web Store" height="58"></a>
 </p>
 
 <p align="center">
-  <a href="https://chromewebstore.google.com/detail/horizon-modern-new-tab/lcmbbnjaajbpdjadlcipfnoghfmlgdhd"><img src="https://img.shields.io/badge/Chrome_Web_Store-v1.0.0-4285F4?style=flat&logo=googlechrome&logoColor=white" alt="Chrome Web Store"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/License-AGPL_v3-7bb026?style=flat" alt="License: AGPL v3"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-AGPL_v3-7bb026?style=flat" alt="License: AGPL v3"></a>
 </p>
 
 <p align="center">
   A clean, elegant dashboard designed to help you stay organized, focused, and inspired every time you open a tab.<br>
-  Brings your Google accounts, 42 bundled Google apps, multi-engine search, and custom wallpapers into one modern workspace with 100% local privacy.
+  Brings your Google accounts, 42 bundled Google apps, browser default search with voice dictation, and custom wallpapers into one modern workspace with 100% local privacy.
 </p>
 
 <p align="center">
@@ -27,7 +27,7 @@
 
 - **Fast Google Account Switching:** Auto-detects active Google sessions (`/u/0`, `/u/1`, etc.) to launch apps directly in your chosen profile.
 - **Complete Google Apps Drawer:** Neatly organized menu with 42 bundled Google apps and drag-and-drop custom ordering.
-- **Multi-Engine Search:** Switch seamlessly between Google, Brave Search, Bing, DuckDuckGo, Qwant, and Yahoo with instant keyboard shortcuts, auto-complete suggestions, and voice dictation.
+- **Browser Default Search & Voice Dictation:** Powered by the official Chrome Search API to respect your preferred search provider (Google, Bing, DuckDuckGo, etc.) with real-time suggestions and voice search.
 - **Customizable Shortcuts:** Keep your daily websites organized in a clean row or 2-column grid with automated high-resolution favicons.
 - **Curated & Custom Backgrounds:** Choose from curated high-resolution nature photography, minimalist solid colors and gradients, or upload your own photo.
 - **Frosted Glass Appearance:** Dark Obsidian and Light Frost themes that adapt to your system appearance with adaptive contrast text.
@@ -48,7 +48,7 @@
 
 <p align="center">
   <img src="assets/screenshots/04_account_switcher.png" alt="Google Account Switcher" width="49%">
-  <img src="assets/screenshots/06_search_engines.png" alt="Multi-Engine Search" width="49%">
+  <img src="assets/screenshots/05_add_account.png" alt="Add Google Account" width="49%">
 </p>
 
 ---
@@ -58,7 +58,10 @@
 ### Option 1: Chrome Web Store (Recommended)
 
 Install directly from the official store listing:
-👉 **[Get Horizon on the Chrome Web Store](https://chromewebstore.google.com/detail/horizon-modern-new-tab/lcmbbnjaajbpdjadlcipfnoghfmlgdhd)**
+
+<a href="https://chromewebstore.google.com/detail/horizon-modern-new-tab/lcmbbnjaajbpdjadlcipfnoghfmlgdhd">
+  <img src="assets/available_chrome_web_store.png" alt="Available in the Chrome Web Store" height="54">
+</a>
 
 ### Option 2: Load Unpacked (Developer Mode)
 
@@ -100,3 +103,7 @@ The packaged archive will be saved in the `releases/` directory.
 ## License
 
 This project is licensed under the [GNU Affero General Public License v3.0 (AGPLv3)](LICENSE).
+
+---
+
+Google Chrome is a trademark of Google LLC. Use of this trademark is subject to Google Permissions.

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v1.0.1] - 2026-09-08
+
+### Changed
+- **Chrome Search API Integration:** Adopted the official `chrome.search.query` API for the new tab search experience to strictly respect the user's default browser search provider, ensuring full compliance with Chrome Web Store Single Purpose guidelines (resolving Red Argon).
+- **Official Chrome Web Store Branding:** Replaced custom badges with official, unaltered Google "Available in the Chrome Web Store" badge assets and added mandatory trademark attribution in documentation and website.
+- **Universal Browser Footer Guide:** Streamlined the browser bottom footer removal guide to be straightforward, visual, and concise across all Chromium browsers (Chrome, Brave, Edge, Opera, Vivaldi).
+- **Icon Refinements:** Restored the frosted glass squircle emblem with zero outer margin padding across all extension, website, and store asset sizes.
+
+### Removed
+- **Multi-Search-Engine Switcher:** Removed the custom search engine dropdown (`Google`, `Brave`, `Bing`, `DuckDuckGo`, `Qwant`, `Yahoo`) and custom search routing.
+- **Third-Party Host Permissions:** Stripped external search engine endpoints (`search.brave.com`, `api.bing.com`, `duckduckgo.com`, `api.qwant.com`, `ff.search.yahoo.com`) from `manifest.json`.
+
 ## [v1.0.0] - 2026-09-05
 
 ### Added

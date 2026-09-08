@@ -1,6 +1,6 @@
 # Privacy Policy for Horizon: Modern New Tab
 
-*Last updated: September 5, 2026*
+*Last updated: September 8, 2026*
 
 Horizon ("the extension") is a lightweight, privacy-focused new tab page extension for Chromium-based browsers (Google Chrome, Brave, Microsoft Edge, Opera, Vivaldi).
 
@@ -14,7 +14,6 @@ All data managed by Horizon is stored locally within your browser using the `chr
 
 - Custom shortcut titles and URLs.
 - Background wallpaper preferences (selected curated wallpaper, custom uploaded wallpaper image data, or solid color choice).
-- Default search engine selection.
 - Interface preferences (theme mode, shortcuts layout mode, voice search language, voice button visibility, and onboarding dismissal states).
 - Locally cached website favicons.
 - Active Google account display names, email addresses, profile image URLs, and account session indices (`/u/N/`).
@@ -27,16 +26,9 @@ All data managed by Horizon is stored locally within your browser using the `chr
 
 Horizon initiates network requests only when strictly necessary to fulfill features directly requested by the user:
 
-### A. Real-Time Search Suggestions
-When you type into the search bar, queries are sent directly to the auto-complete API of the search engine you currently have active:
-- Google (`suggestqueries.google.com`)
-- Brave Search (`search.brave.com`)
-- Bing (`api.bing.com`)
-- DuckDuckGo (`duckduckgo.com`)
-- Qwant (`api.qwant.com`)
-- Yahoo (`ff.search.yahoo.com`)
-
-These requests are made directly between your browser and the respective search provider without passing through any intermediate proxy or third-party server.
+### A. Real-Time Search Suggestions & Execution
+- **Search Query Dispatch:** Horizon utilizes the official Chromium `chrome.search` API (`chrome.search.query`) to execute search queries directly through your browser's default search provider (as configured in your browser settings). Horizon does not hijack, alter, track, or redirect your search queries to third-party search engines.
+- **Real-Time Suggestions:** As you type into the search bar, optional query suggestions are retrieved directly from Google's suggestion endpoint (`suggestqueries.google.com`) and matched against your locally saved shortcuts. These requests are made directly between your browser and the suggestion service without intermediate proxies or logging.
 
 ### B. Curated Wallpapers
 Curated nature backgrounds are retrieved directly from Unsplash's public CDN. If you upload a custom photo from your device, it is processed locally in your browser and stored as a base64 Data URL in your browser's local storage; it is never uploaded to any cloud server.
@@ -55,9 +47,10 @@ Horizon requests only the minimum permissions required for its functionality:
 
 | Permission | Purpose |
 |---|---|
-| `storage` | Saves user shortcuts, themes, search preferences, and settings locally on your machine. |
-| Host permissions (`*.google.com`, `*.googleusercontent.com`) | Detects active Google session indices and profile avatars when the user signs in to Google. |
-| Host permissions (search suggestion endpoints) | Retrieves query auto-complete suggestions from the user's chosen search engine. |
+| `storage` | Saves user shortcuts, wallpapers, theme preferences, and account display states locally on your device. |
+| `search` | Dispatches search queries from the new tab search bar directly to your browser's default search provider via `chrome.search.query` in compliance with Chrome Single Purpose quality guidelines. |
+| Host permissions (`*.google.com`, `*.googleusercontent.com`) | Detects active Google session indices (`/u/N/`) and public profile avatars when signed in to Google to route the Google Apps drawer. |
+| Host permissions (`suggestqueries.google.com`) | Retrieves real-time query auto-complete suggestions for the search bar. |
 
 Horizon does **not** request or use:
 - Browsing history (`history` permission)
@@ -65,6 +58,7 @@ Horizon does **not** request or use:
 - Geolocation tracking
 - Web request interception (`webRequest` permission)
 - Cookies or identity permissions
+- External search engine host permissions
 
 ---
 

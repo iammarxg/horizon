@@ -226,7 +226,7 @@
       <!-- Accounts Tab -->
       <div class="sp-content" id="tab-accounts">
         <div class="sp-section-label">Gmail accounts</div>
-        <p class="sp-hint">Accounts are managed manually. Set each account's Gmail URL index to match the order you're signed in to Google (0 = first, 1 = second, etc.)</p>
+        <p class="sp-hint">Google accounts sync automatically and use your signed-in Google order. Add a manual account only if you need to enter its Gmail URL index yourself.</p>
         <div id="accounts-list"></div>
         <button class="sp-action-btn" id="add-account-btn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4v16m8-8H4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
@@ -527,6 +527,7 @@
     </div>
   </div>
 
+  <script src="account_sync.js"></script>
   <script src="newtab.js"></script>
 </body>
 </html>

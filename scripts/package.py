@@ -24,7 +24,7 @@ RELEASES_DIR = ROOT_DIR / "releases"
 
 # Patterns / filenames to strictly ignore
 IGNORE_PATTERNS = [
-    ".git",
+    ".git*",
     ".github",
     "releases",
     "artifacts",
@@ -36,6 +36,8 @@ IGNORE_PATTERNS = [
     "desktop.ini",
     "*.zip",
     "*_old.*",
+    "_metadata",
+    ".*",
 ]
 
 
@@ -56,10 +58,14 @@ def load_version():
 
 def should_ignore(path: Path) -> bool:
     """Checks if a file or directory matches ignore rules."""
-    name = path.name
-    for pattern in IGNORE_PATTERNS:
-        if fnmatch.fnmatch(name, pattern):
-            return True
+    try:
+        parts = path.relative_to(EXTENSION_DIR).parts
+    except ValueError:
+        parts = path.parts
+    for part in parts:
+        for pattern in IGNORE_PATTERNS:
+            if fnmatch.fnmatch(part, pattern):
+                return True
     return False
 
 
@@ -85,8 +91,9 @@ def build_package():
     files_added = []
 
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
-        for root, _, files in os.walk(EXTENSION_DIR):
-            for file in files:
+        for root, dirs, files in os.walk(EXTENSION_DIR):
+            dirs[:] = [d for d in dirs if not any(fnmatch.fnmatch(d, p) for p in IGNORE_PATTERNS)]
+            for file in sorted(files):
                 full_path = Path(root) / file
                 if not should_ignore(full_path):
                     rel_path = full_path.relative_to(EXTENSION_DIR)

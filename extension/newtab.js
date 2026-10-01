@@ -265,69 +265,21 @@ const GOOGLE_APPS = [
 
 function getAccountIndex() {
   const acc = getActiveAccount();
-  return (acc && typeof acc.gmailIndex === 'number' && !isNaN(acc.gmailIndex) && acc.gmailIndex >= 0) ? acc.gmailIndex : 0;
+  if (!acc || !Number.isInteger(acc.gmailIndex) || acc.gmailIndex < 0) return null;
+  if (String(acc.id || '').startsWith('google_') && state.accountSyncSchemaVersion !== 3) return null;
+  return acc.gmailIndex;
 }
 
 function sanitizeAccountList(accounts) {
-  if (!Array.isArray(accounts)) return [];
-
-  const valid = [];
-  for (const acc of accounts) {
-    if (!acc || !acc.email || typeof acc.email !== 'string') continue;
-    const email = acc.email.toLowerCase().trim();
-    if (!email.includes('@') || email.endsWith('@google.com') || email.endsWith('@example.com')) continue;
-    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) continue;
-
-    const gIdx = (typeof acc.gmailIndex === 'number' && !isNaN(acc.gmailIndex)) ? acc.gmailIndex : 0;
-    const name = (acc.name && typeof acc.name === 'string' && !acc.name.includes('@'))
-      ? acc.name.trim()
-      : email.split('@')[0].replace(/[._\-+]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-
-    valid.push({
-      ...acc,
-      id: acc.id || ('google_' + email.replace(/[^a-z0-9]/g, '_')),
-      name,
-      email,
-      avatarUrl: acc.avatarUrl || '',
-      gmailIndex: gIdx,
-      color: acc.color || ['#4285F4','#EA4335','#34A853','#FBBC04','#00BCD4','#9C27B0','#FF5722'][gIdx % 7],
-      initial: name.charAt(0).toUpperCase()
-    });
-  }
-
-  // Sort by email length ascending so shorter canonical emails come first
-  valid.sort((a, b) => a.email.length - b.email.length);
-
-  const clean = [];
-  const seenEmails = new Set();
-
-  for (const acc of valid) {
-    if (seenEmails.has(acc.email)) continue;
-
-    // Reject phantom concatenation duplicates (e.g. 'ammariammarxgames@gmail.com' ending with 'iammarxgames@gmail.com')
-    const isConcatenatedPhantom = clean.some(accepted =>
-      acc.email.endsWith(accepted.email) && acc.email !== accepted.email
-    );
-    if (isConcatenatedPhantom) continue;
-
-    seenEmails.add(acc.email);
-    clean.push(acc);
-  }
-
-  clean.sort((a, b) => (a.gmailIndex ?? 0) - (b.gmailIndex ?? 0));
-
-  // Normalize indices if non-zero starting or staggered
-  if (clean.length > 0 && clean[0].gmailIndex !== 0) {
-    clean.forEach((acc, idx) => {
-      acc.gmailIndex = idx;
-    });
-  }
-
-  return clean;
+  return window.HorizonAccountSync
+    ? window.HorizonAccountSync.sanitizeAccountList(accounts)
+    : [];
 }
 
 function appUrl(app) {
-  return app.getUrl(getAccountIndex());
+  const index = getAccountIndex();
+  if (index === null && app.getUrl(0) !== app.getUrl(1)) return '#account-sync-required';
+  return app.getUrl(index === null ? 0 : index);
 }
 
 const FAVICON_API = (domain) => `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${domain}&size=256`;
@@ -434,6 +386,19 @@ function extractDisplayNameFromNode(node, email, html = '') {
   return username.replace(/[._\-+]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
+function parseListAccountsProto(b64) {
+  return window.HorizonAccountSync
+    ? window.HorizonAccountSync.parseListAccountsProto(b64)
+    : [];
+}
+
+function parseListAccountsResponse(text) {
+  return window.HorizonAccountSync
+    ? window.HorizonAccountSync.parseListAccountsResponse(text)
+    : [];
+}
+
+
 function parseSignOutOptionsHTML(html) {
   if (!html) return [];
   const parser = new DOMParser();
@@ -459,18 +424,34 @@ function parseSignOutOptionsHTML(html) {
 
     const email = emailMatch[0].toLowerCase();
     if (seen.has(email) || email.endsWith('@google.com') || email.endsWith('@example.com')) return;
-    seen.add(email);
 
-    const container = node.closest('li, [role="listitem"], form, div') || node;
+    const container = node.closest('li, [role="listitem"], [data-email], form') || node.parentElement || node;
+    const containerText = container.textContent || '';
+
+    // Filter out signed-out accounts so they never displace active sessions
+    if (/\bsigned\s*out\b/i.test(containerText)) {
+      return;
+    }
+
+    seen.add(email);
 
     // Session index detection from authuser or /u/
     const authUserStr = node.getAttribute('data-authuser')
       || container.getAttribute('data-authuser')
+      || container.querySelector('input[name="authuser"]')?.value
       || container.querySelector('a[href*="authuser="]')?.href?.match(/authuser=(\d+)/)?.[1]
       || container.querySelector('a[href*="/u/"]')?.href?.match(/\/u\/(\d+)/)?.[1]
       || node.closest('a[href*="authuser="]')?.href?.match(/authuser=(\d+)/)?.[1]
       || node.closest('a[href*="/u/"]')?.href?.match(/\/u\/(\d+)/)?.[1];
-    const sessionIdx = authUserStr !== undefined && authUserStr !== null ? parseInt(authUserStr, 10) : rawAccounts.length;
+
+    let sessionIdx = (authUserStr !== undefined && authUserStr !== null && authUserStr !== '')
+      ? parseInt(authUserStr, 10)
+      : -1;
+
+    // Detect primary account indicated by 'Default' badge in Google Account Chooser
+    if (sessionIdx === -1 && (/\bdefault\b/i.test(containerText) || container.querySelector('[aria-label*="Default" i]'))) {
+      sessionIdx = 0;
+    }
 
     let photoUrl = '';
     const img = container.querySelector('img[src*="googleusercontent.com"], img[src*="gstatic.com"]');
@@ -485,8 +466,8 @@ function parseSignOutOptionsHTML(html) {
       name: name,
       email: email,
       avatarUrl: photoUrl || '',
-      gmailIndex: isNaN(sessionIdx) ? rawAccounts.length : sessionIdx,
-      color: ['#4285F4','#EA4335','#34A853','#FBBC04','#00BCD4','#9C27B0','#FF5722'][(isNaN(sessionIdx) ? rawAccounts.length : sessionIdx) % 7],
+      gmailIndex: sessionIdx,
+      color: ['#4285F4','#EA4335','#34A853','#FBBC04','#00BCD4','#9C27B0','#FF5722'][Math.max(0, sessionIdx) % 7],
       initial: name.charAt(0).toUpperCase(),
     });
   });
@@ -519,7 +500,9 @@ function parseSignOutOptionsHTML(html) {
         name,
         email,
         avatarUrl: photoUrl,
-        gmailIndex: idx,
+        // DOM order is intentionally not a session index. Only explicit
+        // authuser or /u/N observations are authoritative.
+        gmailIndex: null,
         color: ['#4285F4','#EA4335','#34A853','#FBBC04','#00BCD4','#9C27B0','#FF5722'][idx % 7],
         initial: name.charAt(0).toUpperCase(),
       });
@@ -541,52 +524,48 @@ async function fetchAccountsFromSignOutOptions() {
   }
 }
 
-async function fetchGoogleAccountsAPI() {
+async function legacyFetchGoogleAccountsAPI() {
+  return fetchGoogleAccountsAPI();
+  // Retained only as a compatibility reference for older snapshots.
   try {
     const res = await fetch(
-      'https://accounts.google.com/ListAccounts?gpsia=1&source=ChromeExtSettingsMediation&mo=1&mn=1',
+      'https://accounts.google.com/ListAccounts?json=standard&laf=b64bin',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: ' ',
+        credentials: 'include',
+        cache: 'no-cache'
+      }
+    );
+    if (res.ok) {
+      const text = await res.text();
+      const accounts = parseListAccountsResponse(text);
+      if (accounts && accounts.length > 0) return accounts;
+    }
+  } catch (e) {}
+
+  // Secondary fallback: GET request with json=standard
+  try {
+    const fallbackRes = await fetch(
+      'https://accounts.google.com/ListAccounts?json=standard',
       { credentials: 'include', cache: 'no-cache' }
     );
-    if (!res.ok) return [];
-    const text = await res.text();
-    const cleanText = text.replace(/^\)\]\}'?\s*/, '').trim();
-    if (!cleanText) return [];
-    const parsed = JSON.parse(cleanText);
-
-    let list = [];
-    if (Array.isArray(parsed)) {
-      if (Array.isArray(parsed[1])) list = parsed[1];
-      else if (Array.isArray(parsed[0])) list = parsed;
+    if (fallbackRes.ok) {
+      const text = await fallbackRes.text();
+      const accounts = parseListAccountsResponse(text);
+      if (accounts && accounts.length > 0) return accounts;
     }
+  } catch (e) {}
 
-    const accounts = [];
-    list.forEach((item, idx) => {
-      if (Array.isArray(item)) {
-        const sessionIndex = parseInt(item[0], 10);
-        const name = (item[1] && typeof item[1] === 'string' && !item[1].includes('@')) ? item[1].trim() : '';
-        const email = (item[2] && typeof item[2] === 'string') ? item[2].trim() : '';
-        let rawPhoto = (item[3] && typeof item[3] === 'string' && item[3].startsWith('http')) ? item[3] : '';
-        let photoUrl = rawPhoto ? rawPhoto.replace(/=s\d+(-c)?$/, '=s128-c') : '';
-
-        if (email) {
-          accounts.push({
-            name: name,
-            email: email,
-            avatarUrl: photoUrl,
-            gmailIndex: isNaN(sessionIndex) ? idx : sessionIndex,
-          });
-        }
-      }
-    });
-    return accounts;
-  } catch (e) {
-    return [];
-  }
+  return [];
 }
 
 const ACCOUNT_SYNC_TTL_MS = 60 * 60 * 1000; // 1 hour
+const ACCOUNT_SYNC_SCHEMA_VERSION = 3;
 
-async function syncGoogleAccounts(force = false) {
+async function legacySyncGoogleAccounts(force = false) {
+  return syncGoogleAccounts(force);
   const now = Date.now();
   const lastSync = state.lastAccountSync || 0;
   const isExpired = (now - lastSync) > ACCOUNT_SYNC_TTL_MS;
@@ -672,6 +651,32 @@ function resolveAccountAvatar(acc, onResolved) {
   onResolved(null);
 }
 
+// Canonical account synchronization implementation. The legacy implementations
+// above remain only for compatibility with older source snapshots; all runtime
+// calls resolve to these declarations.
+let accountSyncStatus = { state: 'idle', lastAttempt: 0, lastSuccess: 0, errorCode: null };
+
+function syncGoogleAccounts(force = false) {
+  return new Promise(resolve => {
+    chrome.runtime.sendMessage({ type: 'HORIZON_SYNC_GOOGLE_ACCOUNTS', force }, response => {
+      if (chrome.runtime.lastError || !response) {
+        accountSyncStatus = {
+          ...accountSyncStatus,
+          state: 'error',
+          errorCode: chrome.runtime.lastError ? 'worker-unavailable' : 'worker-invalid-response',
+          errorDetail: null
+        };
+        renderAccountPanel();
+        resolve(accountSyncStatus);
+        return;
+      }
+      if (response) accountSyncStatus = response;
+      renderAccountPanel();
+      resolve(response || accountSyncStatus);
+    });
+  });
+}
+
 // ── Default State + State Management ────────────────────────
 
 const DEFAULT_STATE = {
@@ -687,9 +692,11 @@ const DEFAULT_STATE = {
   voiceLang:       'auto',
   showVoiceBtn:    true,
   hasSeenFooterOnboarding: false,
+  accountSyncSchemaVersion: 0,
 };
 
 let state = {};
+let accountUiRevision = 0;
 let activeBgLayer    = 'a';
 let contextTargetId  = null;
 let editingShortcutId = null;
@@ -702,11 +709,36 @@ let isShortcutDragging = false;
 let draggedAppName     = null;
 let isAppDragging      = false;
 
-function saveState() { chrome.storage.local.set({...state}); }
+function saveState() {
+  const {
+    accounts,
+    activeAccountId,
+    lastAccountSync,
+    accountSyncSchemaVersion,
+    ...preferences
+  } = state;
+  return chrome.storage.local.set(preferences);
+}
 
+function saveActiveAccount() {
+  return chrome.storage.local.set({ activeAccountId: state.activeAccountId });
+}
+
+function saveAccounts() {
+  return chrome.storage.local.set({
+    accounts: state.accounts,
+    activeAccountId: state.activeAccountId,
+    google_synced_accounts: state.accounts
+  });
+}
+
+let stateLoadRevision = 0;
 async function loadState() {
+  const revision = ++stateLoadRevision;
   const keys   = Object.keys(DEFAULT_STATE);
-  const stored = await chrome.storage.local.get(keys);
+  const stored = await chrome.storage.local.get([...keys, 'accountSyncStatus']);
+  if (revision !== stateLoadRevision) return;
+  accountSyncStatus = stored.accountSyncStatus || accountSyncStatus;
   state = {};
   for (const k of keys) {
     state[k] = stored[k] !== undefined ? stored[k] : JSON.parse(JSON.stringify(DEFAULT_STATE[k]));
@@ -2966,6 +2998,11 @@ function renderAppsPanel() {
     a.addEventListener('click', e => {
       if (isAppDragging) {
         e.preventDefault();
+        return;
+      }
+      if (a.href.endsWith('#account-sync-required')) {
+        e.preventDefault();
+        document.getElementById('account-btn')?.click();
       }
     });
 
@@ -2976,6 +3013,7 @@ function renderAppsPanel() {
     if (app.isAccountApp) {
       if (active && active.avatarUrl) {
         resolveAccountAvatar(active, avatarSrc => {
+          if (getActiveAccount()?.id !== active.id) return;
           if (avatarSrc) {
             img.src = avatarSrc;
             img.style.borderRadius = '50%';
@@ -3020,6 +3058,7 @@ function refreshAppUrls() {
         if (img) {
           if (active && active.avatarUrl) {
             resolveAccountAvatar(active, avatarSrc => {
+              if (getActiveAccount()?.id !== active.id) return;
               if (avatarSrc) {
                 img.src = avatarSrc;
                 img.style.borderRadius = '50%';
@@ -3044,12 +3083,66 @@ function refreshAppUrls() {
 
 // ── Account Panel ─────────────────────────────────────────────
 
+let manualAccountSyncFeedback = { state: 'idle', tooltip: '' };
+let manualAccountSyncRevision = 0;
+
+function updateManualAccountSyncFeedback(panel) {
+  const syncing = manualAccountSyncFeedback.state === 'syncing';
+  const button = panel.querySelector('#apx-sync');
+  const label = panel.querySelector('#apx-sync-label');
+  const result = panel.querySelector('#apx-sync-result');
+  if (button) {
+    button.disabled = syncing;
+    button.setAttribute('aria-busy', String(syncing));
+  }
+  if (label) label.textContent = syncing ? 'Syncing…' : 'Sync Google Accounts';
+  if (result) {
+    const outcome = manualAccountSyncFeedback.state;
+    const text = outcome === 'success' ? 'Success' : outcome === 'error' ? 'Failed' : '';
+    result.className = `acc-sync-result${text ? ` ${outcome}` : ''}`;
+    result.title = manualAccountSyncFeedback.tooltip;
+    if (result.textContent !== text) result.textContent = text;
+  }
+}
+
+async function syncGoogleAccountsManually() {
+  if (manualAccountSyncFeedback.state === 'syncing') return;
+  const revision = ++manualAccountSyncRevision;
+  manualAccountSyncFeedback = { state: 'syncing', tooltip: '' };
+  renderAccountPanel();
+
+  let result;
+  try {
+    result = await syncGoogleAccounts(true);
+  } catch (error) {
+    result = { state: 'error', errorCode: 'worker-unavailable' };
+    if (revision === manualAccountSyncRevision) {
+      accountSyncStatus = { ...accountSyncStatus, ...result, errorDetail: null };
+    }
+  }
+  // Closing the menu invalidates its feedback without cancelling the worker sync.
+  if (revision !== manualAccountSyncRevision) return;
+  const success = result?.state === 'success' || result?.state === 'empty';
+  const detail = result?.errorDetail || result?.errorCode;
+  manualAccountSyncFeedback = {
+    state: success ? 'success' : 'error',
+    tooltip: result?.state === 'empty' ? 'Google returned no active sessions.'
+      : success ? 'Google accounts synced successfully.'
+      : `Google account refresh failed${detail ? ` (${detail})` : ''}.`
+  };
+  renderAccountPanel();
+}
+
 function renderAccountPanel() {
   const panel  = document.getElementById('account-panel');
   const active = getActiveAccount();
   const others = state.accounts.filter(a => a.id !== state.activeAccountId);
 
+  const resultRegion = panel.querySelector('#apx-sync-result');
   panel.innerHTML = buildAccountPanelHTML(active, others);
+  // Preserve the live region so redraws do not repeat or swallow its announcement.
+  if (resultRegion) panel.querySelector('#apx-sync-result').replaceWith(resultRegion);
+  updateManualAccountSyncFeedback(panel);
   bindAccountPanelEvents(panel);
 }
 
@@ -3093,6 +3186,21 @@ function buildAccountPanelHTML(active, others) {
     </div>`;
   }
 
+  const syncState = accountSyncStatus?.state || 'idle';
+  const lastSuccess = Number.isFinite(accountSyncStatus?.lastSuccess) && accountSyncStatus.lastSuccess > 0
+    ? new Date(accountSyncStatus.lastSuccess).toLocaleString()
+    : '';
+  let syncMessage = 'Waiting for Google account order sync.';
+  if (syncState === 'success') syncMessage = '';
+  if (syncState === 'empty') syncMessage = 'Google returned no active sessions.';
+  if (syncState === 'error') {
+    const detail = accountSyncStatus?.errorDetail || accountSyncStatus?.errorCode;
+    syncMessage = `Google account refresh failed${detail ? ` (${detail})` : ''}${lastSuccess ? `; last successful sync ${lastSuccess}` : ''}.`;
+  }
+  if (syncMessage) {
+    html += `<div class="acc-sync-status ${syncState === 'error' ? 'error' : ''}" role="status">${escHtml(syncMessage)}</div>`;
+  }
+
   if (others.length > 0) {
     html += '<div class="acc-other-list">';
     others.forEach(acc => {
@@ -3126,12 +3234,15 @@ function buildAccountPanelHTML(active, others) {
       </svg>
       Add Google Account
     </button>
-    <button class="acc-action-btn" id="apx-sync">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
-      </svg>
-      Sync Google Accounts
-    </button>
+    <div class="acc-sync-row">
+      <button class="acc-action-btn" id="apx-sync">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+        </svg>
+        <span id="apx-sync-label">Sync Google Accounts</span>
+      </button>
+      <span class="acc-sync-result" id="apx-sync-result" role="status" aria-live="polite" aria-atomic="true"></span>
+    </div>
     <button class="acc-action-btn" id="apx-signout">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -3162,19 +3273,14 @@ function bindAccountPanelEvents(panel) {
   panel.querySelectorAll('.acc-other-item').forEach(item => {
     item.addEventListener('click', () => {
       state.activeAccountId = item.dataset.accid;
-      saveState();
+      saveActiveAccount();
       updateAccountUI();
       renderAppsPanel();
       closeAllPanels();
     });
   });
 
-  panel.querySelector('#apx-sync')?.addEventListener('click', async () => {
-    const btn = panel.querySelector('#apx-sync');
-    if (btn) btn.textContent = 'Syncing...';
-    await syncGoogleAccounts(true);
-    renderAccountPanel();
-  });
+  panel.querySelector('#apx-sync')?.addEventListener('click', syncGoogleAccountsManually);
 
   panel.querySelector('#apx-add-page')?.addEventListener('click', () => {
     closeAllPanels();
@@ -3183,33 +3289,45 @@ function bindAccountPanelEvents(panel) {
 
   panel.querySelector('#apx-signout')?.addEventListener('click', () => {
     const i = getAccountIndex();
+    if (i === null) return;
     window.open(`https://accounts.google.com/Logout?hl=en&continue=https://mail.google.com/mail/u/${i}/`, '_blank');
   });
 
   panel.querySelector('#apx-manage')?.addEventListener('click', () => {
     const i = getAccountIndex();
+    if (i === null) return;
     window.open(`https://myaccount.google.com/u/${i}/`, '_blank');
   });
 }
 
 function updateAccountUI() {
+  const revision = ++accountUiRevision;
   const active = getActiveAccount();
   const avatarEl    = document.getElementById('avatar-inner');
   const gmailLink   = document.getElementById('gmail-link');
   const accountBtn  = document.getElementById('account-btn');
 
   if (active) {
-    gmailLink.href = `https://mail.google.com/mail/u/${active.gmailIndex || 0}/`;
+    const activeIndex = getAccountIndex();
+    gmailLink.href = activeIndex === null ? '#' : `https://mail.google.com/mail/u/${activeIndex}/`;
+    gmailLink.setAttribute('aria-disabled', activeIndex === null ? 'true' : 'false');
+    gmailLink.title = activeIndex === null ? 'Account routing is waiting for Google sync' : 'Gmail';
+    gmailLink.onclick = activeIndex === null ? event => {
+      event.preventDefault();
+      document.getElementById('account-btn')?.click();
+    } : null;
 
     if (active.avatarUrl) {
       resolveAccountAvatar(active, avatarSrc => {
         if (avatarSrc) {
           const testImg = new Image();
           testImg.onload = () => {
+            if (revision !== accountUiRevision || getActiveAccount()?.id !== active.id) return;
             avatarEl.innerHTML = `<img src="${avatarSrc}" alt="${escHtml(active.name)}" />`;
             accountBtn.style.background = 'transparent';
           };
           testImg.onerror = () => {
+            if (revision !== accountUiRevision || getActiveAccount()?.id !== active.id) return;
             avatarEl.innerHTML = (active.initial || active.name.charAt(0)).toUpperCase();
             accountBtn.style.background = active.color;
           };
@@ -3226,7 +3344,13 @@ function updateAccountUI() {
   } else {
     avatarEl.innerHTML          = 'G';
     accountBtn.style.background = '#4285F4';
-    gmailLink.href              = 'https://mail.google.com/mail/u/0/';
+    gmailLink.href              = '#';
+    gmailLink.setAttribute('aria-disabled', 'true');
+    gmailLink.title = 'Connect or sync a Google account first';
+    gmailLink.onclick = event => {
+      event.preventDefault();
+      document.getElementById('account-btn')?.click();
+    };
   }
 
   refreshAppUrls();
@@ -3291,7 +3415,7 @@ function closeAccountModal() {
   editingAccountId = null;
 }
 
-function saveAccount() {
+async function saveAccount() {
   const name  = document.getElementById('acc-name-input').value.trim();
   const email = document.getElementById('acc-email-input').value.trim();
   const gmailIndex = parseInt(document.getElementById('acc-index-input').value, 10);
@@ -3312,6 +3436,10 @@ function saveAccount() {
     initial: name.charAt(0).toUpperCase(),
   };
 
+  const storedAccounts = await chrome.storage.local.get(['accounts', 'activeAccountId']);
+  state.accounts = sanitizeAccountList(storedAccounts.accounts || []);
+  state.activeAccountId = storedAccounts.activeAccountId || state.activeAccountId;
+
   if (editingAccountId) {
     state.accounts = state.accounts.map(a =>
       a.id === editingAccountId ? { ...a, ...accData } : a);
@@ -3321,7 +3449,7 @@ function saveAccount() {
     if (state.accounts.length === 1) state.activeAccountId = newAcc.id;
   }
 
-  saveState();
+  await saveAccounts();
   updateAccountUI();
   renderAppsPanel();
   renderAccountsInPanel();
@@ -3365,17 +3493,20 @@ function renderAccountsInPanel() {
     item.addEventListener('click', e => {
       if (e.target.closest('.acc-edit-btn') || e.target.closest('.acc-del-btn')) return;
       state.activeAccountId = acc.id;
-      saveState(); updateAccountUI(); renderAppsPanel(); renderAccountsInPanel();
+      saveActiveAccount(); updateAccountUI(); renderAppsPanel(); renderAccountsInPanel();
     });
     item.querySelector('.acc-edit-btn').addEventListener('click', e => {
       e.stopPropagation(); openAccountModal(acc.id);
     });
     item.querySelector('.acc-del-btn').addEventListener('click', e => {
       e.stopPropagation();
-      state.accounts = state.accounts.filter(a => a.id !== acc.id);
-      if (state.activeAccountId === acc.id)
-        state.activeAccountId = state.accounts[0]?.id || null;
-      saveState(); updateAccountUI(); renderAppsPanel(); renderAccountsInPanel();
+      chrome.storage.local.get(['accounts', 'activeAccountId']).then(async stored => {
+        state.accounts = sanitizeAccountList(stored.accounts || []).filter(a => a.id !== acc.id);
+        state.activeAccountId = stored.activeAccountId || null;
+        if (state.activeAccountId === acc.id) state.activeAccountId = state.accounts[0]?.id || null;
+        await saveAccounts();
+        updateAccountUI(); renderAppsPanel(); renderAccountsInPanel();
+      });
     });
     list.appendChild(item);
   });
@@ -3482,6 +3613,11 @@ function openPanel(id) {
 }
 
 function closeAllPanels(except) {
+  if (except !== 'account-panel') {
+    ++manualAccountSyncRevision;
+    manualAccountSyncFeedback = { state: 'idle', tooltip: '' };
+    updateManualAccountSyncFeedback(document.getElementById('account-panel'));
+  }
   ['account-panel','apps-panel'].forEach(pid => {
     if (pid !== except) document.getElementById(pid).classList.add('hidden');
   });
@@ -3941,6 +4077,11 @@ function setupEventListeners() {
   });
   if (chrome.storage && chrome.storage.onChanged) {
     chrome.storage.onChanged.addListener((changes, area) => {
+      if (area !== 'local') return;
+      if (changes.accountSyncStatus) {
+        accountSyncStatus = changes.accountSyncStatus.newValue || { state: 'idle' };
+        renderAccountPanel();
+      }
       if (area === 'local' && (changes.google_synced_accounts || changes.accounts || changes.activeAccountId)) {
         loadState().then(() => {
           updateAccountUI();

@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "priority": 1,
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [
+        {
+          "header": "Origin",
+          "operation": "set",
+          "value": "https://www.google.com"
+        }
+      ]
+    },
+    "condition": {
+      "urlFilter": "|https://accounts.google.com/ListAccounts^",
+      "requestDomains": ["accounts.google.com"],
+      "requestMethods": ["post"],
+      "resourceTypes": ["xmlhttprequest", "other"]
+    }
+  }
+]

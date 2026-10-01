@@ -13,62 +13,21 @@
               .trim();
   }
 
-  function sanitizeAccountList(list) {
-    if (!Array.isArray(list)) return [];
+  function sanitizeAccountList(accounts) {
+    return window.HorizonAccountSync
+      ? window.HorizonAccountSync.sanitizeAccountList(accounts)
+      : [];
+  }
 
-    const valid = [];
-    for (const acc of list) {
-      if (!acc || !acc.email || typeof acc.email !== 'string') continue;
-      const email = acc.email.toLowerCase().trim();
-      if (!email.includes('@') || email.endsWith('@google.com') || email.endsWith('@example.com')) continue;
-      if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) continue;
-
-      const gIdx = (typeof acc.gmailIndex === 'number' && !isNaN(acc.gmailIndex)) ? acc.gmailIndex : 0;
-      const name = (acc.name && typeof acc.name === 'string' && !acc.name.includes('@'))
-        ? acc.name.trim()
-        : email.split('@')[0].replace(/[._\-+]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-
-      valid.push({
-        ...acc,
-        id: acc.id || ('google_' + email.replace(/[^a-z0-9]/g, '_')),
-        name,
-        email,
-        avatarUrl: acc.avatarUrl || '',
-        gmailIndex: gIdx,
-        color: acc.color || ['#4285F4','#EA4335','#34A853','#FBBC04','#00BCD4','#9C27B0','#FF5722'][gIdx % 7],
-        initial: name.charAt(0).toUpperCase()
-      });
-    }
-
-    // Sort by email length ascending so shorter canonical emails come first
-    valid.sort((a, b) => a.email.length - b.email.length);
-
-    const clean = [];
-    const seenEmails = new Set();
-
-    for (const acc of valid) {
-      if (seenEmails.has(acc.email)) continue;
-
-      // Drop concatenation duplicates (e.g. 'ammariammarxgames@gmail.com' ending with 'iammarxgames@gmail.com')
-      const isConcatenatedPhantom = clean.some(accepted =>
-        acc.email.endsWith(accepted.email) && acc.email !== accepted.email
-      );
-      if (isConcatenatedPhantom) continue;
-
-      seenEmails.add(acc.email);
-      clean.push(acc);
-    }
-
-    clean.sort((a, b) => (a.gmailIndex ?? 0) - (b.gmailIndex ?? 0));
-
-    // Normalize indices if staggered
-    if (clean.length > 0 && clean[0].gmailIndex !== 0) {
-      clean.forEach((acc, idx) => {
-        acc.gmailIndex = idx;
-      });
-    }
-
-    return clean;
+  function persistAccountMetadata(accounts) {
+    if (!window.HorizonAccountSync || !Array.isArray(accounts)) return;
+    chrome.storage.local.get(['google_account_metadata']).then(result => {
+      let metadata = result.google_account_metadata || {};
+      for (const account of accounts) {
+        metadata = window.HorizonAccountSync.observeMetadata(metadata, account);
+      }
+      return chrome.storage.local.set({ google_account_metadata: metadata });
+    }).catch(() => {});
   }
 
   function scanAccounts() {
@@ -97,18 +56,16 @@
 
           const email = emailMatch[0].toLowerCase();
           if (seen.has(email) || email.endsWith('@google.com') || email.endsWith('@example.com')) return;
+
+          const container = node.closest('li, [role="listitem"], [data-email], form') || node.parentElement || node;
+          const containerText = container.textContent || '';
+
+          // Filter out signed-out accounts so they never displace active sessions
+          if (/\bsigned\s*out\b/i.test(containerText)) {
+            return;
+          }
+
           seen.add(email);
-
-          const container = node.closest('li, [role="listitem"], form, div') || node;
-
-          // Session index detection from authuser or /u/
-          const authUserStr = node.getAttribute('data-authuser')
-            || container.getAttribute('data-authuser')
-            || container.querySelector('a[href*="authuser="]')?.href?.match(/authuser=(\d+)/)?.[1]
-            || container.querySelector('a[href*="/u/"]')?.href?.match(/\/u\/(\d+)/)?.[1]
-            || node.closest('a[href*="authuser="]')?.href?.match(/authuser=(\d+)/)?.[1]
-            || node.closest('a[href*="/u/"]')?.href?.match(/\/u\/(\d+)/)?.[1];
-          const sessionIdx = authUserStr !== undefined && authUserStr !== null ? parseInt(authUserStr, 10) : rawAccounts.length;
 
           let photoUrl = '';
           const img = container.querySelector('img[src*="googleusercontent.com"], img[src*="gstatic.com"]');
@@ -148,22 +105,20 @@
             name: name,
             email: email,
             avatarUrl: photoUrl,
-            gmailIndex: isNaN(sessionIdx) ? rawAccounts.length : sessionIdx,
-            color: ['#4285F4','#EA4335','#34A853','#FBBC04','#00BCD4','#9C27B0','#FF5722'][(isNaN(sessionIdx) ? rawAccounts.length : sessionIdx) % 7],
+            gmailIndex: null,
+            color: '#4285F4',
             initial: name.charAt(0).toUpperCase()
           });
         });
 
         const accounts = sanitizeAccountList(rawAccounts);
         if (accounts.length > 0) {
-          chrome.storage.local.set({
-            google_synced_accounts: accounts,
-            last_account_sync_ts: Date.now()
-          });
+          persistAccountMetadata(accounts);
           return;
         }
       }
 
+      // Live URL session index detection (e.g. /mail/u/1/, /drive/u/0/, ?authuser=2)
       // General detection across Google sites (Gmail, Search, YouTube, etc.)
       const accountBtns = Array.from(document.querySelectorAll('a[aria-label*="Google Account"], a[aria-label*="Google-Konto"], [aria-label*="Compte Google"], a[href*="SignOutOptions"], a[href*="SignOut"], button[aria-label*="Google Account"]'));
       for (const btn of accountBtns) {
@@ -173,28 +128,15 @@
         if (nameMatch && nameMatch[1] && emailMatch) {
           const realName = nameMatch[1].trim();
           const email = emailMatch[0].toLowerCase();
-          chrome.storage.local.get(['google_synced_accounts']).then(res => {
-            const list = sanitizeAccountList(res.google_synced_accounts || []);
-            const match = list.find(a => a.email.toLowerCase() === email);
-            if (match && match.name !== realName && !realName.includes('@')) {
-              match.name = realName;
-              match.initial = realName.charAt(0).toUpperCase();
-              chrome.storage.local.set({ google_synced_accounts: list });
-            }
-          });
+          const avatar = btn.querySelector('img[src*="googleusercontent.com"]');
+          persistAccountMetadata([{
+            email,
+            name: realName,
+            avatarUrl: avatar?.src ? avatar.src.replace(/=s\d+(-c)?$/, '=s128-c') : ''
+          }]);
         }
       }
 
-      // Avatar detection
-      const imgs = Array.from(document.querySelectorAll('img[src*="googleusercontent.com"]'));
-      for (const img of imgs) {
-        const src = img.src || img.getAttribute('src') || '';
-        if (/https:\/\/lh3\.googleusercontent\.com\/(a|ogw)\//i.test(src)) {
-          const highRes = src.replace(/=s\d+(-c)?$/, '=s128-c');
-          chrome.storage.local.set({ google_detected_avatar: highRes });
-          break;
-        }
-      }
     } catch (e) {}
   }
 

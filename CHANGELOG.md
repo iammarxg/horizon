@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v1.0.2] - 2026-09-23
+
+### Fixed
+- **Google Account Routing:** Centralize GAIA order sync in the service worker, refresh hourly, and preserve the last verified mapping when Google is unavailable.
+- **Account Synchronization:** Use Chromium's recognized GAIA caller source and explicitly grant the Accounts endpoint. A single narrowly scoped network rule supplies the Google Origin required by GAIA's POST request; failed syncs show a safe network/HTTP/response diagnostic. Page observations remain metadata-only, manual accounts are preserved, and stale new-tab writes cannot replace newer account state.
+
 ## [v1.0.1] - 2026-09-08
 
 ### Changed

@@ -27,6 +27,8 @@ yarn-error.log*
 # Local Artifacts & Backups
 artifacts/
 *_old.*
+extension/_metadata/
+_metadata/
 
 # Release Archives & Builds
 releases/
@@ -47,3 +49,6 @@ assets/webstore/
 # Scripts (only package.py for GitHub Actions automated releases is tracked)
 scripts/*
 !scripts/package.py
+!scripts/test_account_sync.js
+!scripts/test_background_sync.js
+!scripts/test_gaia_origin_rule.js

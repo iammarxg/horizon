@@ -13,7 +13,7 @@
   }
 
   function isValidEmail(value) {
-    return EMAIL_RE.test(value) && !value.endsWith('@google.com') && !value.endsWith('@example.com');
+    return EMAIL_RE.test(value);
   }
 
   function deriveName(name, email) {
@@ -54,10 +54,16 @@
       seen.add(normalized.email);
       candidates.push(normalized);
     }
-    const allEmails = candidates.map(account => account.email);
-    return candidates.filter(account => !allEmails.some(other =>
-      other !== account.email && account.email.endsWith(other) && account.email.length > other.length
-    ));
+    return candidates.filter(account => {
+      // Verified GAIA records and manual user accounts are never phantom concatenations
+      if (account.gaiaId || !String(account.id || '').startsWith('google_')) return true;
+      return !candidates.some(other =>
+        other.email !== account.email &&
+        !other.gaiaId &&
+        account.email.endsWith(other.email) &&
+        account.email.length > other.email.length
+      );
+    });
   }
 
   function isCanonicalList(accounts) {
@@ -267,10 +273,15 @@
     const existingByEmail = new Map(sanitizeAccountList(current).map(account => [account.email, account]));
     const merged = canonical.map(account => {
       const existing = existingByEmail.get(account.email);
+      const rawAuthoritative = Array.isArray(authoritative) && authoritative.find(a => normalizeEmail(a?.email) === account.email);
+      const incomingName = typeof rawAuthoritative?.name === 'string' && rawAuthoritative.name.trim() && !rawAuthoritative.name.includes('@')
+        ? rawAuthoritative.name.trim()
+        : '';
       return normalizeRecord({
         ...existing,
         ...account,
         id: existing?.id || account.id,
+        name: incomingName || existing?.name || account.name,
         avatarUrl: account.avatarUrl || existing?.avatarUrl || ''
       });
     });

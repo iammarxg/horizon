@@ -3289,14 +3289,18 @@ function bindAccountPanelEvents(panel) {
 
   panel.querySelector('#apx-signout')?.addEventListener('click', () => {
     const i = getAccountIndex();
-    if (i === null) return;
-    window.open(`https://accounts.google.com/Logout?hl=en&continue=https://mail.google.com/mail/u/${i}/`, '_blank');
+    const url = i === null
+      ? 'https://accounts.google.com/Logout?hl=en&continue=https://mail.google.com/mail/'
+      : `https://accounts.google.com/Logout?hl=en&continue=https://mail.google.com/mail/u/${i}/`;
+    window.open(url, '_blank');
   });
 
   panel.querySelector('#apx-manage')?.addEventListener('click', () => {
     const i = getAccountIndex();
-    if (i === null) return;
-    window.open(`https://myaccount.google.com/u/${i}/`, '_blank');
+    const url = i === null
+      ? 'https://myaccount.google.com/'
+      : `https://myaccount.google.com/u/${i}/`;
+    window.open(url, '_blank');
   });
 }
 
@@ -4082,7 +4086,7 @@ function setupEventListeners() {
         accountSyncStatus = changes.accountSyncStatus.newValue || { state: 'idle' };
         renderAccountPanel();
       }
-      if (area === 'local' && (changes.google_synced_accounts || changes.accounts || changes.activeAccountId)) {
+      if (area === 'local' && (changes.google_synced_accounts || changes.accounts || changes.activeAccountId || changes.accountSyncSchemaVersion)) {
         loadState().then(() => {
           updateAccountUI();
           renderAppsPanel();

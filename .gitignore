@@ -52,3 +52,4 @@ scripts/*
 !scripts/test_account_sync.js
 !scripts/test_background_sync.js
 !scripts/test_gaia_origin_rule.js
+!scripts/test_manual_account_sync.js

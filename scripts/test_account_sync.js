@@ -135,5 +135,41 @@ assert.strictEqual(sync.isCanonicalList(authoritative), true);
 assert.strictEqual(sync.isCanonicalList(rotated), false);
 console.log('✓ Canonical-list validation detects rotated mappings');
 
+// Corporate (@google.com) and test (@example.com) emails are valid
+const corporateAccounts = sync.sanitizeAccountList([
+  { email: 'developer@google.com', name: 'Developer', gmailIndex: 0 },
+  { email: 'tester@example.com', name: 'Tester', gmailIndex: 1 }
+]);
+assert.strictEqual(corporateAccounts.length, 2);
+assert.strictEqual(corporateAccounts[0].email, 'developer@google.com');
+assert.strictEqual(corporateAccounts[1].email, 'tester@example.com');
+console.log('✓ Google corporate (@google.com) and documentation (@example.com) emails are valid');
+
+// Verified GAIA accounts with shared suffix usernames are never dropped
+const suffixAccounts = sync.sanitizeAccountList([
+  { email: 'dan@gmail.com', name: 'Dan', gaiaId: 'gaia-dan', id: 'google_dan_gmail_com', gmailIndex: 0 },
+  { email: 'jordan@gmail.com', name: 'Jordan', gaiaId: 'gaia-jordan', id: 'google_jordan_gmail_com', gmailIndex: 1 }
+]);
+assert.strictEqual(suffixAccounts.length, 2);
+assert.deepStrictEqual(suffixAccounts.map(a => a.email), ['dan@gmail.com', 'jordan@gmail.com']);
+console.log('✓ Verified GAIA accounts with shared suffix usernames are preserved');
+
+// Manual user accounts with shared suffix usernames are never dropped
+const manualSuffixAccounts = sync.sanitizeAccountList([
+  { email: 'sam@gmail.com', name: 'Sam', id: 'manual-1', gmailIndex: 0 },
+  { email: 'uncle_sam@gmail.com', name: 'Uncle Sam', id: 'manual-2', gmailIndex: 1 }
+]);
+assert.strictEqual(manualSuffixAccounts.length, 2);
+assert.deepStrictEqual(manualSuffixAccounts.map(a => a.email), ['sam@gmail.com', 'uncle_sam@gmail.com']);
+console.log('✓ Manual user accounts with shared suffix usernames are preserved');
+
+// Authoritative merge preserves existing name if incoming name is empty
+const mergedEmptyName = sync.mergeAuthoritativeAccounts(
+  [{ email: 'account0@gmail.com', name: '', avatarUrl: '' }],
+  [{ email: 'account0@gmail.com', name: 'Saved Name', id: 'google_account0_gmail_com' }]
+);
+assert.strictEqual(mergedEmptyName[0].name, 'Saved Name');
+console.log('✓ Authoritative merge preserves saved name when incoming name is empty');
+
 console.log('====================================');
 console.log('ALL ACCOUNT SYNC TESTS PASSED!');

@@ -25,7 +25,7 @@
 
 ## Key Highlights
 
-- **Fast Google Account Switching:** Auto-detects active Google sessions (`/u/0`, `/u/1`, etc.) to launch apps directly in your chosen profile.
+- **Fast Google Account Switching:** Automatically synchronizes active Google sessions (`/u/0`, `/u/1`, etc.) via service worker background sync with hourly refresh, custom manual entry support, and instant profile switching.
 - **Complete Google Apps Drawer:** Neatly organized menu with 42 bundled Google apps and drag-and-drop custom ordering.
 - **Browser Default Search & Voice Dictation:** Powered by the official Chrome Search API to respect your preferred search provider (Google, Bing, DuckDuckGo, etc.) with real-time suggestions and voice search.
 - **Customizable Shortcuts:** Keep your daily websites organized in a clean row or 2-column grid with automated high-resolution favicons.

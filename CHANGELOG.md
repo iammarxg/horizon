@@ -10,8 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v1.0.2] - 2026-09-23
 
 ### Fixed
-- **Google Account Routing:** Centralize GAIA order sync in the service worker, refresh hourly, and preserve the last verified mapping when Google is unavailable.
-- **Account Synchronization:** Use Chromium's recognized GAIA caller source and explicitly grant the Accounts endpoint. A single narrowly scoped network rule supplies the Google Origin required by GAIA's POST request; failed syncs show a safe network/HTTP/response diagnostic. Page observations remain metadata-only, manual accounts are preserved, and stale new-tab writes cannot replace newer account state.
+- **Google Account Routing:** Centralize GAIA order sync in the service worker, refresh hourly via `alarms`, and preserve the last verified mapping when Google is unavailable.
+- **Account Synchronization:** Use Chromium's recognized GAIA caller source and explicitly grant the Accounts endpoint. A single narrowly scoped declarative net request rule supplies the Google Origin required by GAIA's POST request; failed syncs show a safe network/HTTP/response diagnostic. Page observations remain metadata-only, manual accounts are preserved, and stale new-tab writes cannot replace newer account state.
+- **Account Validation & Deduplication:** Support valid Google corporate (`@google.com`) and test/documentation (`@example.com`) accounts without false rejection. Protect verified GAIA and manual accounts sharing username suffix substrings from accidental deduplication drops.
+- **Authoritative Display Name Retention:** Preserve existing saved display names when incoming authoritative GAIA responses omit or return empty names.
+- **Account Management Fallbacks:** Provide direct unindexed Google URLs for "Sign out of all accounts" and "Manage accounts" actions when the active account index is uninitialized.
+- **Schema Version Reactivity:** Listen for `accountSyncSchemaVersion` changes in storage so open new tab instances immediately refresh account routing indices upon schema transitions.
 
 ## [v1.0.1] - 2026-09-08
 

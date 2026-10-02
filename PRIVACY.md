@@ -1,6 +1,6 @@
 # Privacy Policy for Horizon: Modern New Tab
 
-*Last updated: September 8, 2026*
+*Last updated: October 2, 2026*
 
 Horizon ("the extension") is a lightweight, privacy-focused new tab page extension for Chromium-based browsers (Google Chrome, Brave, Microsoft Edge, Opera, Vivaldi).
 
@@ -37,7 +37,7 @@ Curated nature backgrounds are retrieved directly from Unsplash's public CDN. If
 Voice search uses the browser's native Web Speech API (`webkitSpeechRecognition`). In Google Chrome, spoken audio is processed by Google's native speech-to-text service in accordance with Google's Privacy Policy. In Brave Browser, external speech transmission is blocked by the browser for user privacy. Horizon never records, stores, or transmits audio on its own.
 
 ### D. Google Account Synchronization
-To display your active Google account and route Google Apps drawer links to the correct Gmail account index, a lightweight content script reads your public profile name and avatar from Google session pages you already have open (`*.google.com`, `myaccount.google.com`, `mail.google.com`). This data remains strictly in your browser's `chrome.storage.local`.
+To display your active Google accounts and route Google Apps drawer links to the correct session index (`/u/0/`, `/u/1/`, etc.), the extension service worker periodically queries Google's local session endpoint (`https://accounts.google.com/ListAccounts`). In addition, a lightweight content script observes public display names and profile photos on Google session pages you visit (`*.google.com`, `myaccount.google.com`, `mail.google.com`). All account data, profile images, and session indices remain strictly in your browser's `chrome.storage.local` and are never transmitted to external servers.
 
 ---
 
@@ -49,15 +49,17 @@ Horizon requests only the minimum permissions required for its functionality:
 |---|---|
 | `storage` | Saves user shortcuts, wallpapers, theme preferences, and account display states locally on your device. |
 | `search` | Dispatches search queries from the new tab search bar directly to your browser's default search provider via `chrome.search.query` in compliance with Chrome Single Purpose quality guidelines. |
-| Host permissions (`*.google.com`, `*.googleusercontent.com`) | Detects active Google session indices (`/u/N/`) and public profile avatars when signed in to Google to route the Google Apps drawer. |
+| `alarms` | Schedules a periodic (hourly) background check to keep Google Account session routing indices synchronized while allowing the service worker to remain dormant and conserve system resources. |
+| `declarativeNetRequest` | Used solely to set the `Origin: https://www.google.com` header on background requests to Google's ListAccounts endpoint (`https://accounts.google.com/ListAccounts`) so the extension can synchronize session indices without intercepting or reading general user web traffic. |
+| Host permissions (`accounts.google.com`, `*.google.com`, `*.googleusercontent.com`) | Detects active Google session indices (`/u/N/`) and public profile avatars when signed in to Google to route the Google Apps drawer. |
 | Host permissions (`suggestqueries.google.com`) | Retrieves real-time query auto-complete suggestions for the search bar. |
 
 Horizon does **not** request or use:
 - Browsing history (`history` permission)
 - Tab inspection or monitoring (`tabs` permission)
 - Geolocation tracking
-- Web request interception (`webRequest` permission)
-- Cookies or identity permissions
+- Arbitrary web request interception or traffic monitoring (`webRequest` permission)
+- User credentials, passwords, or cookies access
 - External search engine host permissions
 
 ---
